@@ -1,15 +1,19 @@
 {
   "siteTitle": "我的个人博客",
   "siteSubtitle": "记录代码与生活",
-  "siteUrl": "https://your-domain.com",
+  "siteUrl": "https://thss192.github.io",
   "author": {
-    "name": "张三",
-    "bio": "前端开发者，喜欢 CSS 和咖啡。",
+    "name": "巳🌿🐟",
+    "bio": "未知项目的开发者。",
     "avatar": "images/avatar.png",
-    "email": "zhangsan@example.com",
-    "startYear": 2021,
+    "email": "hi@prismarch.cn",
+    "startYear": 2024,
     "skills": [
-      "全栈开发"
+      "c/c++",
+      "python",
+      "web",
+      "linux",
+      "mysql"
     ],
     "about": {
       "greeting": "你好，我是 {name} 👋",
@@ -41,7 +45,7 @@
   "social": [
     {
       "label": "GitHub",
-      "href": "https://github.com/",
+      "href": "https://github.com/thss192",
       "icon": "fab fa-github"
     },
     {
@@ -64,7 +68,7 @@
   },
   "defaultSort": "asc",
   "hero": {
-    "title": "你好，欢迎来到我的数字花园 🌱",
+    "title": "你好，欢迎来到我的技术博客 🌱",
     "subtitle": "记录代码、思考与生活的碎片。"
   },
   "pageCopy": {

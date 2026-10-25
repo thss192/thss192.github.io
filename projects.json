@@ -1,22 +1,23 @@
 [
   {
-    "name": "My Blog",
-    "description": "基于 Bulma 的纯静态博客，支持深色模式、全文搜索、目录定位等功能。",
-    "url": "https://github.com/",
+    "name": "PA2D",
+    "description": "基于CPU软渲染、SIMD优化、易用的C++图形库(窗口基于Windows)",
+    "url": "https://prismarch.cn",
+    "tags": [
+      "C++",
+      "Graphics",
+      "SIMD"
+    ],
+    "icon": "fa-image"
+  },
+  {
+    "name": "Bulma-Garden",
+    "description": "基于 Bulma CSS 与原生 JS 的极简静态博客。支持 Markdown 解析、自动生成文章 JSON 索引与目录（TOC）。",
+    "url": "https://github.com/thss192/bulma-garden",
     "tags": [
       "HTML",
       "Bulma",
       "JS"
-    ],
-    "icon": "fa-blog"
-  },
-  {
-    "name": "Todo App",
-    "description": "一个基于原生 JavaScript 和 LocalStorage 实现的轻量级待办事项应用。",
-    "url": "https://github.com/",
-    "tags": [
-      "JS",
-      "CSS"
     ],
     "icon": "fa-list-check"
   }
