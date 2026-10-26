@@ -18,7 +18,7 @@
     "about": {
       "greeting": "你好，我是 {name} 👋",
       "paragraphs": [
-        "欢迎来到我的数字花园。我是一名热爱技术、喜欢折腾的开发者。在这里，我会记录我在编程路上的所学、所思、所想。",
+        "欢迎来到我的技术博客。我是一名热爱技术、喜欢折腾的开发者。在这里，我会记录我在编程路上的所学、所思、所想。",
         "如果你对我的文章感兴趣，或者有项目想要合作，欢迎随时通过邮件与我联系。"
       ],
       "contactTitle": "联系我"
@@ -47,11 +47,6 @@
       "label": "GitHub",
       "href": "https://github.com/thss192",
       "icon": "fab fa-github"
-    },
-    {
-      "label": "Twitter",
-      "href": "https://twitter.com/",
-      "icon": "fab fa-twitter"
     }
   ],
   "theme": {

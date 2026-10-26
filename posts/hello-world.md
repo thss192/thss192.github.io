@@ -1,19 +1,340 @@
 ﻿---
-title: 你好，世界
-date: 2025-01-01
-tags: [随笔, 开始]
-summary: 这是第一篇示例文章。
+title: 在服务器上使用python
+date: 2026-10-26
+tags: [项目笔记,python,服务器]
+series: 技术流水账
+summary: 关于本地编写python到服务器运行。
 ---
-# 你好，世界
 
-欢迎来到我的博客。这是第一篇文章。
+## 计划
 
-- 支持 **Markdown**
-- 支持 `代码`
-- 支持列表
+我想要做一个以"个人 AI 助手"为形态的、多模型编排 + 记忆系统 + 人格设定的 LLM 应用后端项目。
 
-```js
-console.log("Hello, Bulma!");
-```
+但是这对服务器的要求应该会很高，而服务器的测试效率远远低于本地，但目标平台我会设在服务器上，所以我最好还是在服务器上跑一些不需要性能的功能，测试环境是否一致。
+
+## 硬性纪律
+
+1. **Python 版本对齐**
+
+- 本地和服务器都用 Python 3.11。服务器官方源可装 3.11，本地也装 3.11，不要用更新的 3.12/3.13。
+- 本地用 `py -3.11` 或明确路径调用，避免和系统其他版本混用。
+
+2. **路径一律用 `pathlib`，不手写分隔符**
+
+- 禁止 `"data\\input.txt"` 这种 Windows 写法。
+- 统一：
+
+~~~python
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent
+INPUT = BASE / "data" / "input.txt"
+~~~
+
+3. **所有文件读写显式指定 `encoding="utf-8"`**
+
+- Windows 中文环境默认 GBK，Linux 默认 UTF-8，不写编码是"本地正常、服务器乱码"的头号原因。
+- 读、写、追加，每一处 `open()` 都带上。
+
+4. **换行符显式处理**
+
+- 涉及文本文件读写，必要时用 `newline=""` 或统一按 `\n` 处理，避免 `\r\n` 混入数据。
+
+5. **依赖全部记进 `requirements.txt`，且不含 Windows 专属包**
+
+- 本地 `pip freeze > requirements.txt`，部署时 `pip install -r requirements.txt`。
+- 禁用 `pywin32`、`win32api` 等只在 Windows 存在的包。
+- 需要编译的包（如某些版本的 `numpy`），服务器上先备好 `gcc`、`python3.11-devel`。
+
+6. **不写死任何环境相关的东西**
+
+- API Key、数据库路径、并发数、后台任务间隔，全部外置到配置文件或环境变量。
+- 代码里不出现 `C:\Users\...`、绝对路径、写死的端口。
+
+7. **并发数做成可配置参数**
+
+- 本地内存大，容易随手写 `max_workers=20`；服务器 4G 内存扛不住。并发数从配置读，服务器上按实际内存调小。
+
+8. **日志写文件，不只 `print`**
+
+- `print` 在 SSH 断开、后台运行时看不到。用 `logging` 写到文件，带时间戳和级别。
+- 日志文件路径也用 `pathlib` 拼。
+
+## 实践(本地创建一个python项目)
+
+### 创建环境和下载依赖
+
+1. 使用pycharm创建 `deepseek-assistant` 项目，输入 `python --version` 回车,确认python版本为3.11.x
+
+2. 装依赖(在终端里直接敲：)
+
+~~~ bash
+pip install openai python-dotenv
+pip freeze > requirements.txt
+~~~
+
+### 书写代码
+1. 创建文件和文件夹
+~~~ bash
+# 用命令直接建文件夹：
+mkdir logs
+# 在 Windows 终端下创建空文件
+type nul > .env
+type nul > .env.example
+type nul > .gitignore
+type nul > config.py
+type nul > client.py
+type nul > main.py
+~~~
+
+2. 各个文件内容
+ 
+- `.env`（本地真实 Key，不提交git）
+~~~ text
+DEEPSEEK_API_KEY=sk-真实key
+~~~
+- `.env.example`（提交这个，告诉别人需要什么变量）
+~~~ text
+DEEPSEEK_API_KEY=your_key_here
+~~~
+- `.gitignore` (必须在写代码和提交之前做，否则 API Key 一旦被 `git add` 就会留在历史里：)
+~~~ gitignore
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# 环境变量与密钥
+.env
+.env.*
+!.env.example
+
+# 日志
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+~~~
+
+- `config.py`（路径全部用 `pathlib`，不写死任何环境相关的东西）
+~~~ python
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+LOG_DIR = BASE_DIR / "logs"
+LOG_FILE = LOG_DIR / "app.log"
+
+def ensure_dirs():
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+~~~
+- `client.py`（读取 Key，封装调用，带日志）
+~~~ python
+import os
+import logging
+from pathlib import Path
+from dotenv import load_dotenv
+from openai import OpenAI
+from config import BASE_DIR, LOG_FILE, ensure_dirs
+
+ensure_dirs()
+
+# 配置日志：写文件，同时输出到控制台
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(LOG_FILE, encoding="utf-8"),  # 显式 utf-8
+        logging.StreamHandler(),
+    ],
+)
+logger = logging.getLogger(__name__)
+
+# 加载 .env：环境变量优先，其次 .env 文件
+load_dotenv(BASE_DIR / ".env")
+
+def get_client() -> OpenAI:
+    api_key = os.getenv("DEEPSEEK_API_KEY")
+    if not api_key:
+        raise RuntimeError("找不到 DEEPSEEK_API_KEY，请在 .env 中设置")
+    return OpenAI(
+        api_key=api_key,
+        base_url="https://api.deepseek.com",  # DeepSeek 官方 base_url [citation:2][citation:3]
+    )
+
+def chat(prompt: str, system: str = "你是一个简洁的助手。") -> str:
+    client = get_client()
+    logger.info("发送请求，prompt 长度=%d", len(prompt))
+    try:
+        resp = client.chat.completions.create(
+            model="deepseek-flash",  # 官方当前模型名 [citation:2][citation:3]
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            stream=False,
+        )
+        content = resp.choices[0].message.content
+        logger.info("收到回复，长度=%d", len(content))
+        return content
+    except Exception as e:
+        logger.error("API 调用失败: %s", e)
+        raise
+~~~
+- `main.py`（入口，不写死任何路径）
+~~~ python
+from client import chat
+
+if __name__ == "__main__":
+    reply = chat("用一句话解释什么是递归。")
+    print(reply)
+~~~
+
+### git管理代码并上传
+
+开始前确认是否已经使用`git init`初始化git(或pycharm创建项目时选择初始化git)
+
+1. 确认 Git 已经就绪，并修改主分支名
+
+~~~ bash
+# 看看当前状态（能看到一排红色的未追踪文件，说明 Git 已经初始化好了）
+git status
+
+# 把默认分支名改为 main
+git branch -M main
+~~~
+
+2. 把代码加入暂存区并提交
+~~~ bash
+git add .
+
+# 再次确认一下：确保 .env 没被加进去
+git status
+
+# 提交代码
+git commit -m "feat: 初始化 DeepSeek 基础对话与日志系统"
+~~~
+
+3. 关联 GitHub 并推送
+去网页上创建一个空仓库（千万别勾选 README 或 .gitignore），拿到链接后执行：
+~~~ bash
+git remote add origin 你的仓库链接.git
+git push -u origin main
+~~~
+
+## 实践(服务器配置刚才写的代码)
+
+1. 登录服务器(本示例使用Alibaba Cloud Linux 3系统的服务器)
+
+~~~ bash
+# 安装 Python 3.11 和编译所需的基础包
+sudo yum install python3.11 python3.11-devel gcc -y
+
+# 验证安装（必须看到 3.11.x）
+python3.11 --version
+~~~
+
+2. 创建新用户并设置密码
+
+~~~ bash
+# 创建名为 dev 的用户（你可以换成任何你喜欢的名字，比如 botuser）
+useradd -m dev
+
+# 设置密码（输入时屏幕不会显示字符，输完回车即可）
+passwd dev
+~~~
+
+3. 安装 Git
+
+~~~ bash
+# 安装 git
+sudo yum install git -y
+# 确认 git 装好了
+git --version
+~~~
 
 
+4. 切换到新用户
+
+~~~ bash
+# 切换到 dev 用户
+su - dev
+~~~
+
+5. 拉取github代码
+
+~~~ bash
+# 确认当前目录是 /home/dev
+pwd
+
+# 克隆代码（私有仓库同样需要输入用户名和 ghp_ 开头的 token）
+git clone https://github.com/你的用户名/你的仓库名.git
+
+~~~
+6. 如果你的仓库是私有（Private）的，这里会提示你输入：
+
+- Username: 输入你的 GitHub 用户名 
+
+- Password: 这里不能输你的 GitHub 登录密码，必须输入你之前生成的 `ghp_` 开头的 Token（如果没生成，去 GitHub 的 Settings -> Developer settings -> Personal access tokens 生成一个，勾选 repo 权限）。
+输入 Token 时屏幕不会显示任何字符，粘贴完直接按回车即可。
+
+Personal access tokens 选择 Tokens (classic)
+
+  1. 点击 Tokens (classic)。
+  2. 点击右上角的 Generate new token -> Generate new token (classic)。
+  3. Note（备注）：随便填，比如填 server-cli，方便以后知道这个 token 是干嘛的。
+  4. Expiration（过期时间）：可以选 30 days 或 90 days（为了安全，不建议选 No expiration）。
+  5. Select scopes（勾选权限）：最关键的一步，只勾选第一项 repo（它下面的子选项会自动全选）。这代表这个 token 只用来读写你的代码仓库。
+  6. 滑到最下面，点绿色的 Generate token。
+  7. 生成后会显示一串 `ghp_` 开头的字符。立刻把它复制下来（离开这个页面就再也看不到了）。
+    
+拿到这串 `ghp_xxx` 后，回到服务器终端。
+
+- Username: 输入 `thss192`
+
+- Password: 右键粘贴你刚才复制的 `ghp_xxx`
+
+若遇到网络问题，可尝试代理：
+
+~~~ bash
+git clone https://你的token@ghproxy.net/https://github.com/你的用户名/你的仓库名.git
+~~~
+
+7. 建虚拟环境与装依赖
+~~~ bash
+# 进入目录
+cd 你的仓库名
+
+# 用 3.11 建虚拟环境
+python3.11 -m venv .venv
+
+# 激活环境
+source .venv/bin/activate
+
+# 装依赖
+pip install -r requirements.txt
+
+~~~
+
+8. 配置 .env
+
+~~~ bash
+vi .env
+~~~
+填入 `DEEPSEEK_API_KEY=sk-xxxx`，保存退出(i->填入->Esc->输入:wq)
+
+9. 运行测试
+
+~~~ bash
+python main.py
+~~~
