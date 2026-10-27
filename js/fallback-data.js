@@ -103,7 +103,7 @@ window.__CONFIG__ = {
 };// 2. 文章列表兜底
 window.__POSTS_FALLBACK__ = [
   {
-    "slug": "hello-world",
+    "slug": "2026-10-26",
     "title": "在服务器上使用python",
     "date": "2026-10-26",
     "order": 9999,
@@ -114,6 +114,17 @@ window.__POSTS_FALLBACK__ = [
     ],
     "series": "技术流水账",
     "summary": "关于本地编写python到服务器运行。"
+  },
+  {
+    "slug": "2026-10-27",
+    "title": "学习git进行项目管理",
+    "date": "2026-10-27",
+    "order": 9999,
+    "tags": [
+      "git"
+    ],
+    "series": "技术流水账",
+    "summary": "git学习笔记。"
   }
 ];
 
