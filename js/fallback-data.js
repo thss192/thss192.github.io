@@ -125,6 +125,17 @@ window.__POSTS_FALLBACK__ = [
     ],
     "series": "技术流水账",
     "summary": "git学习笔记。"
+  },
+  {
+    "slug": "2026-10-28",
+    "title": "学习数据库",
+    "date": "2026-10-27",
+    "order": 9999,
+    "tags": [
+      "sql"
+    ],
+    "series": "技术流水账",
+    "summary": "课程学习笔记。"
   }
 ];
 
