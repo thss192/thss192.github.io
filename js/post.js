@@ -98,10 +98,9 @@ async function renderPostNav(currentSlug) {
     
     // 读取配置文件的默认排序，如果没有默认时间倒序
     const config = window.__CONFIG__ || { defaultSort: "desc" };
-    const defaultSort = config.defaultSort || "desc";
-    
-    // 从 localStorage 读取用户手动切换的排序（如果没有就用默认）
-    let sortMode = localStorage.getItem(`seriesSort_${currentPost.series || 'default'}`) || defaultSort;
+// 改成：全局排序
+const defaultSort = config.defaultSort || "desc";
+let sortMode = localStorage.getItem("globalSort") || defaultSort;
 
     // 根据模式进行排序
     seriesPosts.sort((a, b) => {
@@ -239,13 +238,14 @@ function renderPostExtras(title, date) {
 function renderPostSortUI(currentSlug) {
   const headerEl = document.getElementById("post-header");
   if (!headerEl) return;
-  
+
+  // 防止重复插入
+  if (document.getElementById("post-sort-select")) return;
+
   try {
     const config = window.__CONFIG__ || { defaultSort: "desc" };
     const defaultSort = config.defaultSort || "desc";
-    
-    // 在文章的头部插入一个下拉切换器（仅当有系列时显示）
-    // 为了不破坏原有结构，我们用 DOM 插入
+
     const navArea = document.createElement("div");
     navArea.className = "mt-4 mb-5 is-flex is-align-items-center is-justify-content-flex-end";
     navArea.innerHTML = `
@@ -258,31 +258,26 @@ function renderPostSortUI(currentSlug) {
         </select>
       </div>
     `;
-    
-    // 我们把它插入到 post-status 之前，或者 post-footer-extras 之前
+
     const footerExtras = document.getElementById("post-footer-extras");
     if (footerExtras) {
       footerExtras.parentNode.insertBefore(navArea, footerExtras);
     }
 
-    // 初始化状态并绑定事件
-    // 注意：这里需要知道当前文章的系列，才能重置状态
-    loadPostIndex().then(posts => {
-      const currentPost = posts.find(p => p.slug === currentSlug);
-      const seriesKey = currentPost && currentPost.series ? currentPost.series : 'default';
-      const savedSort = localStorage.getItem(`seriesSort_${seriesKey}`) || defaultSort;
-      
-      const select = document.getElementById("post-sort-select");
-      if (select) {
-        select.value = savedSort;
-        select.addEventListener("change", (e) => {
-          localStorage.setItem(`seriesSort_${seriesKey}`, e.target.value);
-          renderPostNav(currentSlug); // 重新渲染上下篇
-        });
-      }
-    });
-    
-  } catch(e) {}
+    // 读取全局排序（与首页、时间线共用 key）
+    const savedSort = localStorage.getItem("globalSort") || defaultSort;
+
+    const select = document.getElementById("post-sort-select");
+    if (select) {
+      select.value = savedSort;
+      select.addEventListener("change", (e) => {
+        localStorage.setItem("globalSort", e.target.value);
+        renderPostNav(currentSlug); // 重新渲染上下篇
+      });
+    }
+  } catch (e) {
+    console.warn("renderPostSortUI 失败", e);
+  }
 }
 
 async function initPost() {

@@ -1,12 +1,19 @@
-﻿// 首页：按系列分组，支持三种排序（时间正倒序、自定义ID），独立分页
+﻿// 首页：按系列分组，全局排序，系列内紧凑行列表，状态持久化
 
 let ALL_POSTS = [];
-let SITE_CONFIG = {};        
-let ACTIVE_TAG = "__all__"; 
-const SERIES_PAGES = {};
-const SERIES_SORTS = {}; 
-const OPEN_SERIES = {}; 
-const POSTS_PER_PAGE = 4; 
+let SITE_CONFIG = {};
+let ACTIVE_TAG = "__all__";
+
+// 全局排序（与时间线页共用 globalSort）
+let GLOBAL_SORT = "desc";
+const SORT_KEY = "globalSort";
+const POSTS_PER_PAGE = 8;
+
+// 系列状态持久化到 localStorage
+const SERIES_PAGES = JSON.parse(localStorage.getItem("seriesPages") || "{}");
+const OPEN_SERIES = JSON.parse(localStorage.getItem("openSeries") || "{}");
+function savePages() { localStorage.setItem("seriesPages", JSON.stringify(SERIES_PAGES)); }
+function saveOpen() { localStorage.setItem("openSeries", JSON.stringify(OPEN_SERIES)); }
 
 async function loadPostIndex() {
   try {
@@ -19,27 +26,24 @@ async function loadPostIndex() {
   }
 }
 
-// ================= 新增：打字机效果 =================
+// ================= 打字机 =================
 function typeWriter(element, text, speed = 100) {
   let i = 0;
-  element.textContent = ""; 
-  // 核心修复：使用 Array.from 将字符串拆分为正确的字符（包含完整的 Emoji）
-  const chars = Array.from(text); 
+  element.textContent = "";
+  const chars = Array.from(text);
   return new Promise((resolve) => {
     function type() {
       if (i < chars.length) {
         element.textContent += chars[i];
         i++;
         setTimeout(type, speed);
-      } else {
-        resolve();
-      }
+      } else resolve();
     }
     type();
   });
 }
 
-// ================= 新增：动态时间问候 =================
+// ================= 动态问候 =================
 function getDynamicGreeting() {
   const hour = new Date().getHours();
   if (hour >= 5 && hour < 9) return "🌅 早上好，新的一天开始了";
@@ -50,22 +54,20 @@ function getDynamicGreeting() {
   return "🌙 夜深了，早点休息哦";
 }
 
-function renderCard(post) {
-  const tags = (post.tags || []).map(t => `<span class="tag is-info is-light mr-1">${t}</span>`).join("");
+// ================= 紧凑行 =================
+function renderPostRow(post) {
+  const tags = (post.tags || [])
+    .map(t => `<span class="tag">${t}</span>`)
+    .join("");
   return `
-    <div class="column is-6">
-      <div class="card h-100">
-        <div class="card-content">
-          <p class="title is-5 mb-2"><a href="post.html?slug=${encodeURIComponent(post.slug)}">${post.title}</a></p>
-          <p class="subtitle is-7 has-text-grey mb-3">${post.date}</p>
-          <div class="content">${post.summary || ""}</div>
-          <div class="tags">${tags}</div>
-        </div>
-        <footer class="card-footer">
-          <a class="card-footer-item" href="post.html?slug=${encodeURIComponent(post.slug)}">阅读全文</a>
-        </footer>
+    <a class="series-card" href="post.html?slug=${encodeURIComponent(post.slug)}">
+      <div class="series-card-title">${post.title}</div>
+      ${post.summary ? `<div class="series-card-summary">${post.summary}</div>` : ""}
+      <div class="series-card-meta">
+        <span class="series-card-date">${post.date}</span>
+        <span class="series-card-tags">${tags}</span>
       </div>
-    </div>`;
+    </a>`;
 }
 
 function collectTags(posts) {
@@ -74,6 +76,7 @@ function collectTags(posts) {
   return Array.from(set);
 }
 
+// ================= 标签过滤 =================
 function renderTagFilter() {
   const el = document.getElementById("tag-filter");
   const tags = collectTags(ALL_POSTS);
@@ -88,58 +91,79 @@ function renderTagFilter() {
     node.addEventListener("click", () => {
       const tag = node.dataset.tag;
       if (tag === ACTIVE_TAG) return;
-      
       ACTIVE_TAG = tag;
-      Object.keys(SERIES_PAGES).forEach(k => SERIES_PAGES[k] = 1);
 
       const url = new URL(window.location);
-      if (ACTIVE_TAG === "__all__") {
-        url.searchParams.delete("tag");
-      } else {
-        url.searchParams.set("tag", ACTIVE_TAG);
-      }
+      if (ACTIVE_TAG === "__all__") url.searchParams.delete("tag");
+      else url.searchParams.set("tag", ACTIVE_TAG);
       window.history.pushState({}, "", url);
 
-      renderTagFilter();   
-      renderList();        
+      renderTagFilter();
+      renderList();
     });
   });
 }
 
+// ================= 全局排序 UI =================
+function renderSortControl() {
+  const mount = document.getElementById("sort-control");
+  if (!mount) return;
+  mount.innerHTML = `
+    <span class="is-size-7 has-text-grey mr-2">排序：</span>
+    <div class="select is-small is-rounded">
+      <select id="global-sort-select" style="border-color: var(--bulma-border-weak);">
+        <option value="desc">时间倒序</option>
+        <option value="asc">时间正序</option>
+        <option value="order">自定义 ID</option>
+      </select>
+    </div>`;
+  const select = document.getElementById("global-sort-select");
+  select.value = GLOBAL_SORT;
+  select.addEventListener("change", (e) => {
+    GLOBAL_SORT = e.target.value;
+    localStorage.setItem(SORT_KEY, GLOBAL_SORT);
+    // 排序变了，所有系列回到第 1 页
+    Object.keys(SERIES_PAGES).forEach(k => SERIES_PAGES[k] = 1);
+    savePages();
+    renderList();
+  });
+}
+
+// ================= 系列内分页渲染 =================
 function renderSeriesPaginated(seriesName, postsInSeries, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
   if (!SERIES_PAGES[seriesName]) SERIES_PAGES[seriesName] = 1;
-  
-  const sortMode = SERIES_SORTS[seriesName];
-  const currentPage = SERIES_PAGES[seriesName];
 
   const sortedPosts = [...postsInSeries].sort((a, b) => {
-    if (sortMode === "order") return (a.order || 0) - (b.order || 0);
+    if (GLOBAL_SORT === "order") return (a.order || 0) - (b.order || 0);
     const dateA = new Date(a.date).getTime();
     const dateB = new Date(b.date).getTime();
-    return sortMode === "asc" ? dateA - dateB : dateB - dateA;
+    return GLOBAL_SORT === "asc" ? dateA - dateB : dateB - dateA;
   });
 
-  const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
+  const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE) || 1;
+  // 页码越界兜底（标签过滤后可能变少）
+  if (SERIES_PAGES[seriesName] > totalPages) SERIES_PAGES[seriesName] = totalPages;
+  const currentPage = SERIES_PAGES[seriesName];
+
   const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
   const currentPosts = sortedPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
 
-  let html = `<div class="columns is-multiline mt-2">${currentPosts.map(renderCard).join("")}</div>`;
+let html = `<div class="series-card-grid">${currentPosts.map(renderPostRow).join("")}</div>`;
 
   if (totalPages > 1) {
     html += `
-      <nav class="pagination is-small is-centered mt-5" role="navigation">
+      <nav class="pagination is-small is-centered mt-4" role="navigation">
         <a class="pagination-previous ${currentPage === 1 ? "is-disabled" : ""}" data-series="${seriesName}" data-dir="prev">上一页</a>
         <a class="pagination-next ${currentPage === totalPages ? "is-disabled" : ""}" data-series="${seriesName}" data-dir="next">下一页</a>
         <ul class="pagination-list">
-          ${Array.from({length: totalPages}, (_, i) => i + 1).map(p => `
+          ${Array.from({ length: totalPages }, (_, i) => i + 1).map(p => `
             <li><a class="pagination-link ${p === currentPage ? "is-current" : ""}" data-series="${seriesName}" data-page="${p}">${p}</a></li>
           `).join("")}
         </ul>
-      </nav>
-    `;
+      </nav>`;
   }
 
   container.innerHTML = html;
@@ -152,17 +176,21 @@ function renderSeriesPaginated(seriesName, postsInSeries, containerId) {
       if (btn.dataset.dir === "prev") SERIES_PAGES[seriesName]--;
       else if (btn.dataset.dir === "next") SERIES_PAGES[seriesName]++;
       else if (btn.dataset.page) SERIES_PAGES[seriesName] = parseInt(btn.dataset.page, 10);
+      savePages();
 
       renderSeriesPaginated(seriesName, postsInSeries, containerId);
     });
   });
 }
 
+// ================= 主列表 =================
 function renderList() {
   const listEl = document.getElementById("post-list");
   const statusEl = document.getElementById("post-status");
 
-  let filteredPosts = ACTIVE_TAG === "__all__" ? ALL_POSTS : ALL_POSTS.filter(p => (p.tags || []).includes(ACTIVE_TAG));
+  let filteredPosts = ACTIVE_TAG === "__all__"
+    ? ALL_POSTS
+    : ALL_POSTS.filter(p => (p.tags || []).includes(ACTIVE_TAG));
 
   if (filteredPosts.length === 0) {
     statusEl.innerHTML = `<div class="notification is-warning">该标签下暂无文章。</div>`;
@@ -178,26 +206,18 @@ function renderList() {
     grouped[s].push(post);
   });
 
+  // 系列按名字排序，保证渲染顺序稳定
+  const seriesNames = Object.keys(grouped).sort((a, b) => a.localeCompare(b, "zh"));
+
   let html = "";
-  let seriesIndex = 0;
-  
-  const defaultSort = (SITE_CONFIG && SITE_CONFIG.defaultSort) ? SITE_CONFIG.defaultSort : "desc";
+  seriesNames.forEach((seriesName, idx) => {
+    const postsInSeries = grouped[seriesName];
+    const containerId = `series-content-${idx}`;
 
-  for (const [seriesName, postsInSeries] of Object.entries(grouped)) {
-    const containerId = `series-content-${seriesIndex}`;
-    if (!SERIES_PAGES[seriesName]) SERIES_PAGES[seriesName] = 1;
-    
-    if (!SERIES_SORTS[seriesName]) {
-      const savedSort = localStorage.getItem(`seriesSort_${seriesName}`);
-      SERIES_SORTS[seriesName] = savedSort || defaultSort;
-    }
-    
-    const isOpen = OPEN_SERIES[seriesName] !== false; 
-    const openClass = isOpen ? "is-active" : "";
+    // 默认展开；用户手动折叠过则记住
+    const isOpen = OPEN_SERIES[seriesName] !== false;
     const displayStyle = isOpen ? "display: block;" : "display: none;";
-    const iconRotate = isOpen ? "transform: rotate(180deg);" : "";
-
-    const currentSort = SERIES_SORTS[seriesName];
+    const iconRotate = isOpen ? "transform: rotate(180deg);" : "transform: rotate(0deg);";
 
     html += `
       <div class="mb-5">
@@ -208,79 +228,42 @@ function renderList() {
               ${seriesName}
               <span class="series-count ml-2">${postsInSeries.length} 篇</span>
             </div>
-            
-            <div class="is-flex is-align-items-center ml-auto">
-              <div class="select is-small is-rounded mr-4">
-                <select class="sort-select" data-series="${seriesName}" style="background-color: var(--bulma-scheme-main-bis); border-color: var(--bulma-border-weak);">
-                  <option value="asc" ${currentSort === 'asc' ? 'selected' : ''}>时间正序</option>
-                  <option value="desc" ${currentSort === 'desc' ? 'selected' : ''}>时间倒序</option>
-                  <option value="order" ${currentSort === 'order' ? 'selected' : ''}>自定义 ID</option>
-                </select>
-              </div>
-              <span class="icon is-small series-icon-toggle" style="${iconRotate}"><i class="fas fa-chevron-down"></i></span>
-            </div>
+            <span class="icon is-small series-icon-toggle ml-auto" style="${iconRotate}"><i class="fas fa-chevron-down"></i></span>
           </div>
-          <div id="${containerId}" class="series-content ${openClass}" style="${displayStyle}"></div>
+          <div id="${containerId}" class="series-content" style="${displayStyle}"></div>
         </div>
-      </div>
-    `;
-    
+      </div>`;
+
     setTimeout(() => renderSeriesPaginated(seriesName, postsInSeries, containerId), 0);
-    seriesIndex++;
-  }
+  });
 
   listEl.innerHTML = html;
 
+  // 折叠事件
   listEl.querySelectorAll(".toggle-trigger").forEach(trigger => {
-    trigger.addEventListener("click", (e) => {
-      if (e.target.closest(".select")) return;
-
+    trigger.addEventListener("click", () => {
       const accordion = trigger.closest(".series-accordion");
       const content = accordion.querySelector(".series-content");
       const icon = trigger.querySelector(".series-icon-toggle");
       const sName = accordion.dataset.seriesName;
-      
+
       const isHidden = content.style.display === "none";
       content.style.display = isHidden ? "block" : "none";
       icon.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
       OPEN_SERIES[sName] = isHidden;
-    });
-  });
-
-  listEl.querySelectorAll(".sort-select").forEach(select => {
-    select.addEventListener("change", (e) => {
-      e.stopPropagation();
-      const sName = select.dataset.series;
-      const newSort = e.target.value;
-      
-      SERIES_SORTS[sName] = newSort;
-      SERIES_PAGES[sName] = 1; 
-      localStorage.setItem(`seriesSort_${sName}`, newSort); 
-      
-      const accordion = select.closest(".series-accordion");
-      const containerId = accordion.querySelector(".series-content").id;
-      
-      let filteredPosts = ACTIVE_TAG === "__all__" ? ALL_POSTS : ALL_POSTS.filter(p => (p.tags || []).includes(ACTIVE_TAG));
-      const grouped = {};
-      filteredPosts.forEach(post => {
-        const s = post.series || "未分类文章";
-        if (!grouped[s]) grouped[s] = [];
-        grouped[s].push(post);
-      });
-      
-      renderSeriesPaginated(sName, grouped[sName], containerId);
+      saveOpen();
     });
   });
 }
 
+// ================= 初始化 =================
 async function initHome() {
   const config = await initLayout("index.html");
-  
-  // 渲染 Hero (加入打字机)
+
+  // Hero 打字机
   const hero = (config && config.hero) || {};
   const heroTitle = document.getElementById("hero-title");
   const heroSubtitle = document.getElementById("hero-subtitle");
-  
   if (heroTitle) {
     const textToType = hero.title || "";
     heroTitle.innerHTML = '<span id="typewriter-text"></span><span class="cursor" style="display:inline-block;width:3px;height:1em;background:var(--bulma-primary);vertical-align:text-bottom;margin-left:2px;animation:blink 0.8s infinite;"></span>';
@@ -289,20 +272,23 @@ async function initHome() {
   if (heroSubtitle) heroSubtitle.textContent = hero.subtitle || "";
 
   SITE_CONFIG = config || {};
+
+  // 全局排序初始化
+  GLOBAL_SORT = localStorage.getItem(SORT_KEY) || (SITE_CONFIG.defaultSort || "desc");
+  renderSortControl();
+
   const statusEl = document.getElementById("post-status");
-  
   const profileEl = document.getElementById("sidebar-profile");
   const sidebarProjects = document.getElementById("sidebar-projects");
-  
-  // 渲染侧边栏项目
+
+  // 侧边栏项目
   if (sidebarProjects) {
     let projects = [];
     try {
       const res = await fetch("projects.json");
       if (res.ok) projects = await res.json();
-    } catch (e) { 
+    } catch (e) {
       projects = window.__PROJECTS_FALLBACK__ || [];
-      if (!projects.length) projects = [{name: 'My Blog', url:'#', description:'My Blog'}, {name:'Todo App', url:'#', description:'Todo App'}]; 
     }
     sidebarProjects.innerHTML = projects.slice(0, 2).map(p => `
       <li class="mb-2">
@@ -312,7 +298,7 @@ async function initHome() {
     `).join("");
   }
 
-  // 渲染个人名片 (加入动态问候)
+  // 个人名片
   if (profileEl && config && config.author) {
     const a = config.author;
     const greeting = getDynamicGreeting();
@@ -321,27 +307,22 @@ async function initHome() {
         <figure class="image is-96x96 is-inline-block mb-3"><img class="is-rounded" src="${a.avatar || "images/avatar.png"}" style="object-fit: cover;"></figure>
         <h3 class="title is-5 mb-1">${a.name || "佚名"}</h3>
         <p class="is-size-7 has-text-grey mb-2">${a.bio || "开发者"}</p>
-        <!-- 动态问候 -->
         <div class="has-text-primary is-size-7 mb-3 font-weight-bold" style="background: var(--bulma-primary-soft); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block;">
           ${greeting}
         </div>
         <br>
         <a href="about.html" class="button is-small is-rounded is-light">了解更多</a>
-      </div>
-    `;
+      </div>`;
   }
 
   try {
-    const posts = await loadPostIndex();
-    ALL_POSTS = posts;
-
+    ALL_POSTS = await loadPostIndex();
     if (ALL_POSTS.length === 0) {
       statusEl.innerHTML = `<div class="notification is-warning">还没有文章。</div>`;
       return;
     }
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlTag = urlParams.get("tag");
+
+    const urlTag = new URLSearchParams(window.location.search).get("tag");
     if (urlTag && collectTags(ALL_POSTS).includes(urlTag)) ACTIVE_TAG = urlTag;
     else ACTIVE_TAG = "__all__";
 
@@ -353,4 +334,3 @@ async function initHome() {
 }
 
 initHome();
-

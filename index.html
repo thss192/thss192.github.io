@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="libs/fontawesome/css/all.min.css" />
   <link rel="stylesheet" href="custom.css" />
   <link rel="stylesheet" href="custom-themes.css" />
-  <!-- Anti-FOUC: 防止页面刷新时主题闪烁 -->
+  <!-- Anti-FOUC -->
   <script>
     (function() {
       var mode = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -36,7 +36,10 @@
       <div class="columns is-variable is-8">
         <!-- 左侧：主内容区 -->
         <div class="column is-8">
-          <h2 class="title is-4 mb-4">最新文章</h2>
+          <div class="is-flex is-align-items-center is-justify-content-space-between is-flex-wrap-wrap mb-4" style="gap:.75rem;">
+            <h2 class="title is-4 mb-0">最新文章</h2>
+            <div id="sort-control" class="is-flex is-align-items-center"></div>
+          </div>
           <div id="tag-filter" class="tags mb-5"></div>
           <div id="post-list"></div>
           <div id="post-status"></div>
@@ -44,10 +47,8 @@
 
         <!-- 右侧：侧边栏 -->
         <div class="column is-4">
-          <!-- 个人名片 (动态渲染) -->
           <div id="sidebar-profile" class="mb-5"></div>
-          
-          <!-- 推荐项目 (静态展示) -->
+
           <div class="box mb-5" style="border-radius: var(--bulma-radius-large);">
             <h3 class="title is-5 mb-3"><i class="fas fa-code-branch has-text-primary mr-2"></i>开源项目</h3>
             <ul id="sidebar-projects" class="menu-list"></ul>
@@ -61,7 +62,7 @@
   </section>
 
   <div id="site-footer"></div>
-  
+
   <script src="js/fallback-data.js"></script>
   <script src="js/common.js" defer></script>
   <script src="js/home.js" defer></script>
@@ -69,7 +70,3 @@
   <script src="js/theme.js" defer></script>
 </body>
 </html>
-
-
-
-
