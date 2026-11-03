@@ -170,6 +170,19 @@ window.__POSTS_FALLBACK__ = [
     ],
     "series": "技术流水账",
     "summary": "学习decker第一步。"
+  },
+  {
+    "slug": "2026-11-03",
+    "title": "关于文件组织与推送",
+    "date": "2026-11-03",
+    "order": 9999,
+    "tags": [
+      "python",
+      "git",
+      "项目笔记"
+    ],
+    "series": "技术流水账",
+    "summary": "关于编写过程中怎么组织代码。"
   }
 ];
 
