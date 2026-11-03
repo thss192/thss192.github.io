@@ -127,15 +127,49 @@ window.__POSTS_FALLBACK__ = [
     "summary": "git学习笔记。"
   },
   {
-    "slug": "2026-10-28",
+    "slug": "2026-10-28_1",
     "title": "学习数据库",
-    "date": "2026-10-27",
+    "date": "2026-10-28",
     "order": 9999,
     "tags": [
       "sql"
     ],
     "series": "技术流水账",
     "summary": "课程学习笔记。"
+  },
+  {
+    "slug": "2026-10-28_2",
+    "title": "Git 指令进阶练习",
+    "date": "2026-10-28",
+    "order": 9999,
+    "tags": [
+      "git"
+    ],
+    "series": "技术流水账",
+    "summary": "在上次项目下继续练习常用 Git 指令。"
+  },
+  {
+    "slug": "2026-10-31",
+    "title": "对于新服务器的配置",
+    "date": "2026-10-31",
+    "order": 9999,
+    "tags": [
+      "服务器"
+    ],
+    "series": "技术流水账",
+    "summary": "关于如何配置新买的云服务器。"
+  },
+  {
+    "slug": "2026-11-01",
+    "title": "Docker 入门",
+    "date": "2026-11-01",
+    "order": 9999,
+    "tags": [
+      "服务器",
+      "docker"
+    ],
+    "series": "技术流水账",
+    "summary": "学习decker第一步。"
   }
 ];
 
