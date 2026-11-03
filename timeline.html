@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>归档 · 我的博客</title>
+  <link rel="stylesheet" href="libs/bulma.min.css" />
+  <link rel="stylesheet" href="libs/fontawesome/css/all.min.css" />
+  <link rel="stylesheet" href="custom.css" />
+  <link rel="stylesheet" href="custom-themes.css" />
+  <link rel="stylesheet" href="timeline.css" />
+  <script>
+    (function() {
+      var mode = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      if (mode === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      var palette = localStorage.getItem('palette') || 'default';
+      if (palette !== 'default') document.documentElement.setAttribute('data-palette', palette);
+    })();
+  </script>
+</head>
+<body>
+  <div id="site-navbar"></div>
+
+  <section class="hero is-light" style="margin-top: 3.25rem;">
+    <div class="hero-body py-6">
+      <div class="container">
+        <h1 class="title is-2 mb-3">
+          <span class="icon has-text-primary mr-2"><i class="fas fa-clock-rotate-left"></i></span>
+          归档
+        </h1>
+        <p class="subtitle is-5 has-text-grey">按时间翻阅所有文章。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section pt-5">
+    <div class="container">
+      <div class="timeline-layout">
+        <!-- 左：年月纵向导航 -->
+        <aside class="timeline-sidebar" id="timeline-sidebar">
+          <div class="timeline-sidebar-inner" id="timeline-sidebar-inner"></div>
+        </aside>
+
+        <!-- 右：文章卡片 -->
+        <main class="timeline-main" id="timeline-main"></main>
+      </div>
+      <div id="timeline-status"></div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script src="js/fallback-data.js"></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/timeline.js" defer></script>
+  <script src="js/effects.js" defer></script>
+  <script src="js/theme.js" defer></script>
+</body>
+</html>

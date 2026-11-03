@@ -1,0 +1,479 @@
+/* ==========================================================================
+   Timeline Page - 年月导航 + 文章卡片
+   ========================================================================== */
+
+.timeline-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* ---------- 左侧年月导航 ---------- */
+.timeline-sidebar {
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 7rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.5rem;
+  cursor: grab;
+  user-select: none;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE/Edge */
+}
+.timeline-sidebar::-webkit-scrollbar { display: none; }   /* Chrome/Safari */
+.timeline-sidebar.is-dragging { cursor: grabbing; }
+
+.timeline-sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.25rem 0;
+}
+
+/* 年份分组标题 */
+.timeline-year {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--bulma-text-light);
+  padding: 1rem 0.75rem 0.35rem;
+  position: relative;
+}
+.timeline-year:not(:first-child) {
+  margin-top: 0.5rem;
+  border-top: 1px dashed var(--bulma-border-weak);
+}
+.timeline-year:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+}
+
+/* 月份按钮 */
+.timeline-month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--bulma-radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--bulma-text);
+  cursor: pointer;
+  position: relative;
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+}
+.timeline-month::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 60%;
+  background: var(--bulma-primary);
+  border-radius: 2px;
+  transition: transform 0.2s ease;
+}
+.timeline-month:hover {
+  background: var(--bulma-primary-soft);
+  color: var(--bulma-primary);
+  padding-left: 1rem;
+}
+.timeline-month.is-active {
+  background: var(--bulma-primary-soft);
+  color: var(--bulma-primary);
+  font-weight: 700;
+  padding-left: 1rem;
+}
+.timeline-month.is-active::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+.timeline-month-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--bulma-text-light);
+  background: var(--bulma-scheme-main-ter);
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--bulma-radius-rounded);
+  min-width: 1.5rem;
+  text-align: center;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.timeline-month.is-active .timeline-month-count,
+.timeline-month:hover .timeline-month-count {
+  background: var(--bulma-primary);
+  color: var(--bulma-primary-invert);
+}
+
+/* ---------- 右侧文章区 ---------- */
+.timeline-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  min-height: 40vh;
+}
+
+.timeline-section {
+  scroll-margin-top: 5rem;
+}
+
+.timeline-section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--bulma-primary-soft);
+}
+.timeline-section-title .timeline-section-year {
+  color: var(--bulma-primary);
+}
+.timeline-section-count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--bulma-text-light);
+  background: var(--bulma-scheme-main-ter);
+  padding: 0.1rem 0.55rem;
+  border-radius: var(--bulma-radius-rounded);
+}
+
+/* 文章卡片网格 */
+.timeline-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.timeline-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--bulma-radius-large);
+  border: 1px solid var(--bulma-border-weak);
+  background: linear-gradient(135deg, var(--bulma-scheme-main), var(--bulma-scheme-main-bis));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: transform 0.22s cubic-bezier(0.25, 0.8, 0.25, 1),
+              box-shadow 0.22s ease,
+              border-color 0.22s ease;
+  text-decoration: none;
+  color: inherit;
+}
+.timeline-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--bulma-primary-soft);
+}
+
+.timeline-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--bulma-text-strong);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.timeline-card:hover .timeline-card-title {
+  color: var(--bulma-primary);
+}
+
+.timeline-card-summary {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--bulma-text-light);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.timeline-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+.timeline-card-date {
+  font-size: 0.72rem;
+  color: var(--bulma-text-light);
+  font-family: var(--bulma-family-code);
+}
+.timeline-card-tags {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.timeline-card-tags .tag {
+  font-size: 0.65rem;
+  height: 1.4em;
+}
+
+/* ---------- 深色模式 ---------- */
+[data-theme="dark"] .timeline-year {
+  color: var(--text-dark-muted);
+}
+[data-theme="dark"] .timeline-year:not(:first-child) {
+  border-top-color: var(--border-dark);
+}
+[data-theme="dark"] .timeline-month:hover,
+[data-theme="dark"] .timeline-month.is-active {
+  background: rgba(0, 200, 150, 0.1);
+}
+[data-theme="dark"] .timeline-month-count {
+  background: var(--bg-dark-card-hover);
+  color: var(--text-dark-muted);
+}
+[data-theme="dark"] .timeline-card {
+  background: linear-gradient(135deg, var(--bg-dark-card-hover), var(--bg-dark-card));
+  border-color: var(--border-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+[data-theme="dark"] .timeline-card:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  border-color: var(--bulma-primary);
+}
+[data-theme="dark"] .timeline-section-count {
+  background: var(--bg-dark-card-hover);
+  color: var(--text-dark-muted);
+}
+
+/* ---------- 响应式 ---------- */
+@media screen and (max-width: 768px) {
+  .timeline-layout {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .timeline-sidebar {
+    position: relative;
+    top: 0;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--bulma-border-weak);
+    cursor: default;
+  }
+  .timeline-sidebar-inner {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  .timeline-year {
+    display: none;
+  }
+  .timeline-month {
+    width: auto;
+    flex-shrink: 0;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--bulma-border-weak);
+    border-radius: var(--bulma-radius-rounded);
+  }
+  .timeline-month::before { display: none; }
+  .timeline-month.is-active {
+    background: var(--bulma-primary);
+    color: var(--bulma-primary-invert);
+    border-color: var(--bulma-primary);
+  }
+  .timeline-month.is-active .timeline-month-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--bulma-primary-invert);
+  }
+  .timeline-cards {
+    grid-template-columns: 1fr;
+  }
+  .timeline-main { gap: 1.75rem; }
+}
+
+/* ==========================================================================
+   视觉增强：卡片装饰图案 + 强对比标签
+   ========================================================================== */
+
+/* ---------- 卡片本体增强 ---------- */
+.timeline-card {
+  position: relative;
+  overflow: hidden;
+  border-width: 1.5px;
+  border-color: var(--bulma-border);
+  background:
+    radial-gradient(circle at 100% 0%, var(--bulma-primary-soft) 0%, transparent 45%),
+    linear-gradient(135deg, var(--bulma-scheme-main), var(--bulma-scheme-main-bis));
+}
+.timeline-card:hover {
+  border-color: var(--bulma-primary);
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.08),
+    0 0 0 3px var(--bulma-primary-soft);
+}
+
+/* 装饰图案：花朵（默认） */
+.timeline-card::before {
+  content: "";
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 74px;
+  height: 74px;
+  pointer-events: none;
+  color: var(--bulma-primary);
+  opacity: 0.14;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><ellipse cx='50' cy='22' rx='13' ry='20'/><ellipse cx='50' cy='78' rx='13' ry='20'/><ellipse cx='22' cy='50' rx='20' ry='13'/><ellipse cx='78' cy='50' rx='20' ry='13'/><ellipse cx='30' cy='30' rx='13' ry='18' transform='rotate(45 30 30)'/><ellipse cx='70' cy='30' rx='13' ry='18' transform='rotate(-45 70 30)'/><ellipse cx='30' cy='70' rx='13' ry='18' transform='rotate(-45 30 70)'/><ellipse cx='70' cy='70' rx='13' ry='18' transform='rotate(45 70 70)'/><circle cx='50' cy='50' r='9' fill='white'/></g></svg>");
+          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><ellipse cx='50' cy='22' rx='13' ry='20'/><ellipse cx='50' cy='78' rx='13' ry='20'/><ellipse cx='22' cy='50' rx='20' ry='13'/><ellipse cx='78' cy='50' rx='20' ry='13'/><ellipse cx='30' cy='30' rx='13' ry='18' transform='rotate(45 30 30)'/><ellipse cx='70' cy='30' rx='13' ry='18' transform='rotate(-45 70 30)'/><ellipse cx='30' cy='70' rx='13' ry='18' transform='rotate(-45 30 70)'/><ellipse cx='70' cy='70' rx='13' ry='18' transform='rotate(45 70 70)'/><circle cx='50' cy='50' r='9' fill='white'/></g></svg>");
+  -webkit-mask-size: contain;
+          mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  transform: rotate(0deg);
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
+}
+.timeline-card:hover::before {
+  opacity: 0.28;
+  transform: rotate(45deg) scale(1.1);
+}
+
+/* 奇数卡片换成星星图案，交错点缀 */
+.timeline-card:nth-child(2n)::before {
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon fill='black' points='50,8 60,38 92,38 66,57 76,90 50,70 24,90 34,57 8,38 40,38'/></svg>");
+          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon fill='black' points='50,8 60,38 92,38 66,57 76,90 50,70 24,90 34,57 8,38 40,38'/></svg>");
+}
+.timeline-card:nth-child(2n):hover::before {
+  transform: rotate(72deg) scale(1.12);
+}
+
+/* 卡片标题更醒目 */
+.timeline-card-title {
+  font-weight: 700;
+  font-size: 1.02rem;
+  padding-right: 2.5rem;   /* 给右上角图案留空 */
+  position: relative;
+}
+.timeline-card:hover .timeline-card-title {
+  text-decoration: underline;
+  text-decoration-color: var(--bulma-primary);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+/* 日期做成小色块 */
+.timeline-card-date {
+  font-family: var(--bulma-family-code);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--bulma-primary);
+  background: var(--bulma-primary-soft);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--bulma-radius-rounded);
+  letter-spacing: 0.2px;
+}
+
+/* ---------- 标签：描边 + 主色文字，hover 填充 ---------- */
+.timeline-card-tags .tag {
+  font-size: 0.66rem !important;
+  height: 1.6em !important;
+  padding: 0 0.55em !important;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  background-color: transparent !important;
+  color: var(--bulma-primary) !important;
+  border: 1.5px solid var(--bulma-primary) !important;
+  border-radius: var(--bulma-radius-rounded) !important;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.timeline-card:hover .timeline-card-tags .tag {
+  background-color: var(--bulma-primary) !important;
+  color: var(--bulma-primary-invert) !important;
+}
+.timeline-card-tags .tag:hover {
+  transform: translateY(-1px);
+}
+
+/* ---------- 右侧区块标题也加点层次 ---------- */
+.timeline-section-title {
+  position: relative;
+  padding-left: 0.9rem;
+}
+.timeline-section-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: linear-gradient(to bottom, var(--bulma-primary), var(--bulma-primary-soft));
+  border-radius: 3px;
+}
+.timeline-section-count {
+  border: 1px solid var(--bulma-border-weak);
+}
+
+/* ---------- 左栏月份按钮增强 ---------- */
+.timeline-month {
+  border-left: 2px solid transparent;
+}
+.timeline-month::before {
+  width: 4px;
+}
+.timeline-month.is-active {
+  box-shadow: inset 0 0 0 1px var(--bulma-primary-soft);
+}
+.timeline-month-count {
+  border: 1px solid var(--bulma-border-weak);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 深色模式微调 ---------- */
+[data-theme="dark"] .timeline-card {
+  border-color: #3a3a3a;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(0, 200, 150, 0.08) 0%, transparent 45%),
+    linear-gradient(135deg, var(--bg-dark-card-hover), var(--bg-dark-card));
+}
+[data-theme="dark"] .timeline-card:hover {
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.5),
+    0 0 0 3px rgba(0, 200, 150, 0.15);
+}
+[data-theme="dark"] .timeline-card::before {
+  opacity: 0.18;
+}
+[data-theme="dark"] .timeline-card:hover::before {
+  opacity: 0.35;
+}
+[data-theme="dark"] .timeline-card-date {
+  background: rgba(0, 200, 150, 0.12);
+}
+[data-theme="dark"] .timeline-card-tags .tag {
+  border-color: var(--bulma-primary) !important;
+  color: var(--bulma-primary) !important;
+}
+[data-theme="dark"] .timeline-card:hover .timeline-card-tags .tag {
+  background-color: var(--bulma-primary) !important;
+  color: var(--bg-dark) !important;
+}
+[data-theme="dark"] .timeline-section-count {
+  border-color: var(--border-dark);
+}
+[data-theme="dark"] .timeline-month-count {
+  border-color: var(--border-dark);
+}
