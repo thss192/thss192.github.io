@@ -177,12 +177,19 @@ window.__POSTS_FALLBACK__ = [
     "date": "2026-11-03",
     "order": 9999,
     "tags": [
-      "python",
-      "git",
-      "项目笔记"
+      "git"
     ],
     "series": "技术流水账",
     "summary": "关于编写过程中怎么组织代码。"
+  },
+  {
+    "slug": "2026-11-04",
+    "title": "2026-11-04",
+    "date": "2026-11-04",
+    "order": 9999,
+    "tags": [],
+    "series": "技术流水账",
+    "summary": ""
   }
 ];
 

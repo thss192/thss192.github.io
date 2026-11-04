@@ -218,7 +218,7 @@ function renderFooter(config) {
     <footer class="footer">
       <div class="content has-text-centered">
         <p><strong>${config.siteTitle}</strong> · ${config.siteSubtitle || ""}</p>
-        <p>© ${year} ${config.author?.name || ""} · Powered by Bulma</p>
+        <p>© ${year} ${config.author?.name || ""} · Powered by GitHub Pages</p>
       </div>
     </footer>`;
 }
