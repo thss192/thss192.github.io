@@ -316,16 +316,61 @@ async function initPost() {
     if (!res.ok) throw new Error("HTTP " + res.status);
     const raw = await res.text();
     const { meta, body } = parseFrontMatter(raw);
-    renderContent(meta.title || slug, meta.date || "", meta.tags || [], body);
+     renderContent(meta.title || slug, meta.date || "", meta.tags || [], body, meta);
   } catch (e) {
     statusEl.innerHTML = `<div class="notification is-danger">读取文章失败：${e.message}</div>`;
   }
 }
 
-function renderContent(title, date, tags, rawBody) {
+function renderBreadcrumb(meta) {
+  const crumbEl = document.getElementById("post-breadcrumb");
+  if (!crumbEl) return;
+
+  const cat = meta.category;
+  const series = meta.series;
+
+  if (!cat && !series) {
+    crumbEl.innerHTML = "";
+    return;
+  }
+
+  // 跳转到时间线
+  if (!cat) {
+    crumbEl.innerHTML = `
+      <a href="posts.html?view=series&category=${encodeURIComponent(series)}&series=all" class="button is-small is-rounded is-light">
+        <span class="icon is-small"><i class="fas fa-layer-group"></i></span>
+        <span>查看系列：${series}</span>
+      </a>
+    `;
+    return;
+  }
+
+  // 跳转到系列页
+  let url = `posts.html?view=series&category=${encodeURIComponent(cat)}`;
+  if (series) {
+    url += `&series=${encodeURIComponent(series)}`;
+  } else {
+    url += `&series=all`;
+  }
+
+  const seriesLabel = series ? `<span class="mx-2 has-text-grey-light">/</span> ${series}` : "";
+  
+  crumbEl.innerHTML = `
+    <a href="${url}" class="button is-small is-rounded is-light">
+      <span class="icon is-small"><i class="fas fa-folder-open"></i></span>
+      <span>返回目录：${cat}${seriesLabel}</span>
+    </a>
+  `;
+}
+
+function renderContent(title, date, tags, rawBody, meta) {
   const headerEl = document.getElementById("post-header");
   const bodyEl = document.getElementById("post-body");
   
+  if (meta) {
+    renderBreadcrumb(meta);
+  }
+
   const readTime = calcReadTime(rawBody);
 
   const tagHtml = (tags || [])

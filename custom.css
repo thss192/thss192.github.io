@@ -406,3 +406,30 @@ body.sky-tinted.sky-night {
 .no-anim-sky #sky-moon {
   transition: none !important;
 }
+
+/* 文章详情页面包屑 */
+#post-breadcrumb {
+  display: flex;
+  align-items: center;
+}
+#post-breadcrumb .button {
+  background-color: var(--bulma-scheme-main-bis);
+  border: 1px solid var(--bulma-border-weak);
+  color: var(--bulma-text-light);
+  transition: all 0.2s ease;
+}
+#post-breadcrumb .button:hover {
+  background-color: var(--bulma-primary-soft);
+  border-color: var(--bulma-primary);
+  color: var(--bulma-primary);
+}
+[data-theme="dark"] #post-breadcrumb .button {
+  background-color: var(--bg-dark-card-hover);
+  border-color: var(--border-dark);
+  color: #ccc;
+}
+[data-theme="dark"] #post-breadcrumb .button:hover {
+  background-color: rgba(0, 200, 150, 0.15);
+  border-color: var(--bulma-primary);
+  color: var(--bulma-primary);
+}
