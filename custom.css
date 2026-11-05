@@ -19,6 +19,7 @@
   --bg-dark-card-hover: #222;
   --text-dark-muted: #888;
   --border-dark: #2a2a2a;
+  --bulma-text-light: #6f6f6f;
 }
 
 :root[data-palette="default"] { --bg-body: #f4f7f7; }
