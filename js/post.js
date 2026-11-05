@@ -98,9 +98,8 @@ async function renderPostNav(currentSlug) {
     
     // 读取配置文件的默认排序，如果没有默认时间倒序
     const config = window.__CONFIG__ || { defaultSort: "desc" };
-// 改成：全局排序
-const defaultSort = config.defaultSort || "desc";
-let sortMode = localStorage.getItem("globalSort") || defaultSort;
+    const defaultSort = config.defaultSort || "desc";
+    let sortMode = localStorage.getItem("globalSort") || defaultSort;
 
     // 根据模式进行排序
     seriesPosts.sort((a, b) => {

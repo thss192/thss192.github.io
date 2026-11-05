@@ -108,11 +108,11 @@ window.__POSTS_FALLBACK__ = [
     "date": "2026-10-26",
     "order": 9999,
     "tags": [
-      "项目笔记",
       "python",
       "服务器"
     ],
-    "series": "技术流水账",
+    "category": "项目笔记",
+    "series": "Python",
     "summary": "关于本地编写python到服务器运行。"
   },
   {
@@ -123,7 +123,8 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "git"
     ],
-    "series": "技术流水账",
+    "category": "项目笔记",
+    "series": "项目规范",
     "summary": "git学习笔记。"
   },
   {
@@ -134,7 +135,8 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "sql"
     ],
-    "series": "技术流水账",
+    "category": "课程笔记",
+    "series": "SQL",
     "summary": "课程学习笔记。"
   },
   {
@@ -145,7 +147,8 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "git"
     ],
-    "series": "技术流水账",
+    "category": "项目笔记",
+    "series": "项目规范",
     "summary": "在上次项目下继续练习常用 Git 指令。"
   },
   {
@@ -156,7 +159,8 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "服务器"
     ],
-    "series": "技术流水账",
+    "category": "项目笔记",
+    "series": "Linux",
     "summary": "关于如何配置新买的云服务器。"
   },
   {
@@ -168,7 +172,8 @@ window.__POSTS_FALLBACK__ = [
       "服务器",
       "docker"
     ],
-    "series": "技术流水账",
+    "category": "项目笔记",
+    "series": "Decker",
     "summary": "学习decker第一步。"
   },
   {
@@ -179,26 +184,9 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "git"
     ],
-    "series": "技术流水账",
+    "category": "项目笔记",
+    "series": "项目规范",
     "summary": "关于编写过程中怎么组织代码。"
-  },
-  {
-    "slug": "2026-11-04 copy",
-    "title": "2026-11-04 copy",
-    "date": "2026-11-04",
-    "order": 9999,
-    "tags": [],
-    "series": "技术流水账",
-    "summary": ""
-  },
-  {
-    "slug": "2026-11-04",
-    "title": "2026-11-04",
-    "date": "2026-11-04",
-    "order": 9999,
-    "tags": [],
-    "series": "技术流水账",
-    "summary": ""
   }
 ];
 

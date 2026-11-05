@@ -47,6 +47,7 @@ files.forEach(f => {
     date: meta.date || "2000-01-01",
     order: meta.order ? parseInt(meta.order, 10) : 9999, // 提取 order
     tags: meta.tags || [],
+    category: meta.category || "", // <-- 新增提取 category 字段
     series: meta.series || "",
     summary: meta.summary || ""
   });
@@ -123,5 +124,4 @@ if (DRY_RUN) {
 syncFallback(posts);
 syncConfigToFallback();
 
-console.log(`✅ 解析完成，包含 order 字段，共 ${posts.length} 篇文章。`);
-
+console.log(`✅ 解析完成，共 ${posts.length} 篇文章。`);
