@@ -27,6 +27,7 @@
  "nav": [
     { "label": "首页", "href": "index.html" },
     { "label": "文章", "href": "posts.html" },
+    { "label": "留言板", "href": "guestbook.html" },
     { "label": "项目", "href": "projects.html" },
     { "label": "友链", "href": "links.html" },
     { "label": "关于", "href": "about.html" }
@@ -63,6 +64,9 @@
       "title": "全部文章",
       "subtitle": "记录代码、思考与生活的碎片。",
       "browserTitle": "文章"
+    },
+    "guestbookPage": {
+      "browserTitle": "留言板"
     },
     "projectsPage": {
       "title": "开源项目",
