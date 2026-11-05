@@ -84,7 +84,12 @@
       "exchangeNote": "如果你也有自己的博客，欢迎发邮件与我交换友链！"
     },
     "aboutPage": {
-      "title": "关于我"
+      "title": "关于我",
+      "subtitle": "探索代码与生活的边界"
+    },
+    "timelinePage": {
+      "title": "归档",
+      "subtitle": "按时间翻阅所有文章。"
     },
     "page404": {
       "code": "404",

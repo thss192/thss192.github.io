@@ -3,9 +3,14 @@
 async function initAbout() {
   const config = await initLayout("about.html");
   const el = document.getElementById("about-content");
+
+  const ap = ((config && config.pageCopy) || {}).aboutPage || {};
+  const titleEl = document.getElementById("page-title");
+  const subtitleEl = document.getElementById("page-subtitle");
+  if (titleEl) titleEl.textContent = ap.title || "关于我";
+  if (subtitleEl) subtitleEl.textContent = ap.subtitle || "";
+
   const a = config.author || {};
-  const pageTitleEl = document.getElementById("about-page-title");
-  if (pageTitleEl) pageTitleEl.textContent = ((config.pageCopy || {}).aboutPage || {}).title || "关于我";
 
   // 计算工作年限
   const currentYear = new Date().getFullYear();

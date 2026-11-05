@@ -21,19 +21,40 @@
 <body>
   <div id="site-navbar"></div>
 
-  <section class="hero is-light" style="margin-top: 3.25rem;">
-    <div class="hero-body py-6">
+  <!-- 动态天空横幅 -->
+  <section class="hero is-light hero-sky" style="margin-top: 3.25rem;">
+    <div id="sky-celestial"></div>
+    <div id="sky-stars"></div>
+    
+    <div class="time-control">
+      <div class="time-info">
+        <span id="time-display" class="time-text">12:00:00</span>
+        <span class="time-divider">·</span>
+        <span id="date-display" class="date-text">1月1日 周一</span>
+      </div>
+      <button id="time-btn" class="time-btn" title="切换时段效果">
+        <span id="time-icon">☀️ 白天</span>
+      </button>
+    </div>
+
+    <div class="hero-body py-5" style="position: relative; z-index: 2;">
       <div class="container">
-        <h1 class="title is-2 mb-3">
-          <span class="icon has-text-primary mr-2"><i class="fas fa-clock-rotate-left"></i></span>
-          归档
+        <h1 id="page-title" class="title is-2 mb-3" style="color: inherit;">
+          <span class="icon has-text-primary mr-2" style="color: inherit;"><i class="fas fa-clock-rotate-left"></i></span>
+          <span id="timeline-title-text"></span>
         </h1>
-        <p class="subtitle is-5 has-text-grey">按时间翻阅所有文章。</p>
+        <p id="page-subtitle" class="subtitle is-5" style="color: inherit; opacity: 0.8;"></p>
       </div>
     </div>
   </section>
 
-  <section class="section pt-5">
+  <section class="section pt-5" style="position: relative;">
+    <div class="hero-bottom-decoration">
+      <span class="deco-diamond"></span>
+      <span class="deco-line"></span>
+      <span class="deco-diamond"></span>
+    </div>
+
     <div class="container">
       <div class="timeline-layout">
         <!-- 左：年月纵向导航 -->
@@ -54,6 +75,7 @@
   <script src="js/common.js" defer></script>
   <script src="js/timeline.js" defer></script>
   <script src="js/effects.js" defer></script>
+  <script src="js/sky.js" defer></script>
   <script src="js/theme.js" defer></script>
 </body>
 </html>

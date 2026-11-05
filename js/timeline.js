@@ -225,8 +225,14 @@ function initDragScroll() {
 
 /* ---------------- 初始化 ---------------- */
 async function initTimeline() {
-  await initLayout("timeline.html");
+  const config = await initLayout("timeline.html");
   const statusEl = document.getElementById("timeline-status");
+
+  const tp = ((config && config.pageCopy) || {}).timelinePage || {};
+  const titleEl = document.getElementById("timeline-title-text");
+  const subtitleEl = document.getElementById("page-subtitle");
+  if (titleEl) titleEl.textContent = tp.title || "归档";
+  if (subtitleEl) subtitleEl.textContent = tp.subtitle || "按时间翻阅所有文章。";
 
   try {
     ALL_POSTS = await loadPostIndex();
