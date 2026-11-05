@@ -1,0 +1,315 @@
+/* ==========================================================================
+   Posts Page (All in one: Series & Timeline)
+   ========================================================================== */
+
+/* 1. 页面布局 */
+.posts-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* 2. 左侧边栏 */
+.posts-sidebar {
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 7rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.5rem;
+  scrollbar-width: none;
+}
+.posts-sidebar::-webkit-scrollbar { display: none; }
+
+/* 切换按钮 */
+.posts-view-toggle .button {
+  justify-content: flex-start;
+  font-weight: 600;
+}
+
+/* 导航列表 */
+.posts-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+/* 列表项 */
+.post-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--bulma-radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--bulma-text);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+}
+.post-nav-item:hover {
+  background: var(--bulma-primary-soft);
+  color: var(--bulma-primary);
+  padding-left: 1rem;
+}
+.post-nav-item.is-active {
+  background: var(--bulma-primary-soft);
+  color: var(--bulma-primary);
+  font-weight: 700;
+  padding-left: 1rem;
+}
+.post-nav-item .count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--bulma-text-light);
+  background: var(--bulma-scheme-main-ter);
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--bulma-radius-rounded);
+}
+.post-nav-item:hover .count,
+.post-nav-item.is-active .count {
+  background: var(--bulma-primary);
+  color: var(--bulma-primary-invert);
+}
+
+/* 3. 右侧内容区 */
+.posts-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  min-height: 40vh;
+}
+
+/* 分组标题 */
+.posts-group {
+  scroll-margin-top: 5rem;
+}
+.posts-group-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--bulma-primary-soft);
+  position: relative;
+  padding-left: 0.9rem;
+}
+.posts-group-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: linear-gradient(to bottom, var(--bulma-primary), var(--bulma-primary-soft));
+  border-radius: 3px;
+}
+.posts-group-title .year {
+  color: var(--bulma-primary);
+}
+.posts-group-count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--bulma-text-light);
+  background: var(--bulma-scheme-main-ter);
+  padding: 0.1rem 0.55rem;
+  border-radius: var(--bulma-radius-rounded);
+  border: 1px solid var(--bulma-border-weak);
+}
+
+/* 卡片网格 */
+.posts-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+/* ==========================================================================
+   4. 文章卡片样式 (复用并增强)
+   ========================================================================== */
+.timeline-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--bulma-radius-large);
+  border: 1.5px solid var(--bulma-border);
+  background:
+    radial-gradient(circle at 100% 0%, var(--bulma-primary-soft) 0%, transparent 45%),
+    linear-gradient(135deg, var(--bulma-scheme-main), var(--bulma-scheme-main-bis));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.22s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.timeline-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08), 0 0 0 3px var(--bulma-primary-soft);
+  border-color: var(--bulma-primary);
+}
+
+/* 装饰图案 */
+.timeline-card::before {
+  content: "";
+  position: absolute;
+  top: -18px; right: -18px;
+  width: 74px; height: 74px;
+  pointer-events: none;
+  color: var(--bulma-primary);
+  opacity: 0.14;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><ellipse cx='50' cy='22' rx='13' ry='20'/><ellipse cx='50' cy='78' rx='13' ry='20'/><ellipse cx='22' cy='50' rx='20' ry='13'/><ellipse cx='78' cy='50' rx='20' ry='13'/><ellipse cx='30' cy='30' rx='13' ry='18' transform='rotate(45 30 30)'/><ellipse cx='70' cy='30' rx='13' ry='18' transform='rotate(-45 70 30)'/><ellipse cx='30' cy='70' rx='13' ry='18' transform='rotate(-45 30 70)'/><ellipse cx='70' cy='70' rx='13' ry='18' transform='rotate(45 70 70)'/><circle cx='50' cy='50' r='9' fill='white'/></g></svg>");
+          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><ellipse cx='50' cy='22' rx='13' ry='20'/><ellipse cx='50' cy='78' rx='13' ry='20'/><ellipse cx='22' cy='50' rx='20' ry='13'/><ellipse cx='78' cy='50' rx='20' ry='13'/><ellipse cx='30' cy='30' rx='13' ry='18' transform='rotate(45 30 30)'/><ellipse cx='70' cy='30' rx='13' ry='18' transform='rotate(-45 70 30)'/><ellipse cx='30' cy='70' rx='13' ry='18' transform='rotate(-45 30 70)'/><ellipse cx='70' cy='70' rx='13' ry='18' transform='rotate(45 70 70)'/><circle cx='50' cy='50' r='9' fill='white'/></g></svg>");
+  -webkit-mask-size: contain;
+          mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  transform: rotate(0deg);
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
+}
+.timeline-card:hover::before { opacity: 0.28; transform: rotate(45deg) scale(1.1); }
+
+.timeline-card:nth-child(2n)::before {
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon fill='black' points='50,8 60,38 92,38 66,57 76,90 50,70 24,90 34,57 8,38 40,38'/></svg>");
+          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon fill='black' points='50,8 60,38 92,38 66,57 76,90 50,70 24,90 34,57 8,38 40,38'/></svg>");
+}
+.timeline-card:nth-child(2n):hover::before { transform: rotate(72deg) scale(1.12); }
+
+.timeline-card-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--bulma-text-strong);
+  line-height: 1.4;
+  padding-right: 2.5rem;
+  position: relative;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.timeline-card:hover .timeline-card-title {
+  color: var(--bulma-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--bulma-primary);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.timeline-card-summary {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--bulma-text-light);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.timeline-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+.timeline-card-date {
+  font-family: var(--bulma-family-code);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--bulma-primary);
+  background: var(--bulma-primary-soft);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--bulma-radius-rounded);
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+.timeline-card-tags {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.timeline-card-tags .tag {
+  font-size: 0.66rem !important;
+  height: 1.6em !important;
+  padding: 0 0.55em !important;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  background-color: transparent !important;
+  color: var(--bulma-primary) !important;
+  border: 1.5px solid var(--bulma-primary) !important;
+  border-radius: var(--bulma-radius-rounded) !important;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.timeline-card:hover .timeline-card-tags .tag {
+  background-color: var(--bulma-primary) !important;
+  color: var(--bulma-primary-invert) !important;
+}
+.timeline-card-tags .tag:hover { transform: translateY(-1px); }
+
+/* 深色模式卡片适配 */
+[data-theme="dark"] .timeline-card {
+  border-color: #3a3a3a;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(0, 200, 150, 0.08) 0%, transparent 45%),
+    linear-gradient(135deg, var(--bg-dark-card-hover), var(--bg-dark-card));
+}
+[data-theme="dark"] .timeline-card:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(0, 200, 150, 0.15);
+  border-color: var(--bulma-primary);
+}
+[data-theme="dark"] .timeline-card::before { opacity: 0.18; }
+[data-theme="dark"] .timeline-card:hover::before { opacity: 0.35; }
+[data-theme="dark"] .timeline-card-date { background: rgba(0, 200, 150, 0.12); }
+[data-theme="dark"] .timeline-card-tags .tag { border-color: var(--bulma-primary) !important; color: var(--bulma-primary) !important; }
+[data-theme="dark"] .timeline-card:hover .timeline-card-tags .tag { background-color: var(--bulma-primary) !important; color: var(--bg-dark) !important; }
+
+/* ==========================================================================
+   5. 移动端适配
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+  .posts-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .posts-sidebar {
+    position: relative;
+    top: 0;
+    max-height: none;
+    border-bottom: 1px solid var(--bulma-border-weak);
+    padding-bottom: 1rem;
+  }
+  .posts-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  .post-nav-item {
+    white-space: nowrap;
+    width: auto;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--bulma-border-weak);
+    border-radius: var(--bulma-radius-rounded);
+  }
+  .post-nav-item.is-active {
+    background: var(--bulma-primary);
+    color: var(--bulma-primary-invert);
+    border-color: var(--bulma-primary);
+  }
+  .posts-cards {
+    grid-template-columns: 1fr;
+  }
+}

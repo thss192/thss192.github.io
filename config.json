@@ -24,27 +24,12 @@
       "contactTitle": "联系我"
     }
   },
-  "nav": [
-    {
-      "label": "首页",
-      "href": "index.html"
-    },
-    {
-    "label": "归档",
-    "href": "timeline.html"
-    },
-    {
-      "label": "项目",
-      "href": "projects.html"
-    },
-    {
-      "label": "友链",
-      "href": "links.html"
-    },
-    {
-      "label": "关于",
-      "href": "about.html"
-    }
+ "nav": [
+    { "label": "首页", "href": "index.html" },
+    { "label": "文章", "href": "posts.html" },
+    { "label": "项目", "href": "projects.html" },
+    { "label": "友链", "href": "links.html" },
+    { "label": "关于", "href": "about.html" }
   ],
   "social": [
     {
@@ -87,9 +72,9 @@
       "title": "关于我",
       "subtitle": "探索代码与生活的边界"
     },
-    "timelinePage": {
-      "title": "归档",
-      "subtitle": "按时间翻阅所有文章。"
+    "postsPage": {
+      "title": "全部文章",
+      "subtitle": "记录代码、思考与生活的碎片。"
     },
     "page404": {
       "code": "404",

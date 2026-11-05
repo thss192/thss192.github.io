@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>归档 · 我的博客</title>
+  <title>文章 · 我的博客</title>
   <link rel="stylesheet" href="libs/bulma.min.css" />
   <link rel="stylesheet" href="libs/fontawesome/css/all.min.css" />
   <link rel="stylesheet" href="custom.css" />
   <link rel="stylesheet" href="custom-themes.css" />
-  <link rel="stylesheet" href="timeline.css" />
+  <link rel="stylesheet" href="posts.css" />
   <script>
     (function() {
       var mode = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -40,8 +40,8 @@
     <div class="hero-body py-5" style="position: relative; z-index: 2;">
       <div class="container">
         <h1 id="page-title" class="title is-2 mb-3" style="color: inherit;">
-          <span class="icon has-text-primary mr-2" style="color: inherit;"><i class="fas fa-clock-rotate-left"></i></span>
-          <span id="timeline-title-text"></span>
+          <span class="icon has-text-primary mr-2" style="color: inherit;"><i class="fas fa-book-open"></i></span>
+          <span id="posts-title-text">全部文章</span>
         </h1>
         <p id="page-subtitle" class="subtitle is-5" style="color: inherit; opacity: 0.8;"></p>
       </div>
@@ -49,18 +49,24 @@
   </section>
 
   <section class="section pt-5" style="position: relative;">
-
     <div class="container">
-      <div class="timeline-layout">
-        <!-- 左：年月纵向导航 -->
-        <aside class="timeline-sidebar" id="timeline-sidebar">
-          <div class="timeline-sidebar-inner" id="timeline-sidebar-inner"></div>
+      <div class="posts-layout">
+        <!-- 左侧控制栏 -->
+        <aside class="posts-sidebar">
+          <!-- 视图切换 -->
+          <div class="posts-view-toggle mb-5">
+            <button class="button is-small is-fullwidth is-primary mb-2" id="view-by-series">按系列分类</button>
+            <button class="button is-small is-fullwidth is-light" id="view-by-time">按时间归档</button>
+          </div>
+          
+          <!-- 导航列表 -->
+          <div class="posts-nav" id="posts-sidebar-inner"></div>
         </aside>
 
-        <!-- 右：文章卡片 -->
-        <main class="timeline-main" id="timeline-main"></main>
+        <!-- 右侧内容区 -->
+        <main class="posts-main" id="posts-main"></main>
       </div>
-      <div id="timeline-status"></div>
+      <div id="posts-status"></div>
     </div>
   </section>
 
@@ -68,7 +74,7 @@
 
   <script src="js/fallback-data.js"></script>
   <script src="js/common.js" defer></script>
-  <script src="js/timeline.js" defer></script>
+  <script src="js/posts.js" defer></script>
   <script src="js/effects.js" defer></script>
   <script src="js/sky.js" defer></script>
   <script src="js/theme.js" defer></script>
