@@ -352,19 +352,19 @@ body.sky-tinted.sky-night {
 @media screen and (max-width: 900px) {
   .posts-cards, #post-list .posts-cards { grid-template-columns: 1fr; }
 }
-
 /* ===== 动态天空：太阳与月牙独立控制 ===== */
 
 /* 太阳（默认状态） */
 #sky-celestial {
-  transition: opacity 0.8s ease, transform 0.8s ease !important;
+  transition: opacity 0.4s ease, transform 0.4s ease !important;
 }
 
-/* 晚上太阳隐身 */
+/* 晚上太阳隐身：快速下落，并且没有延迟（先执行） */
 #sky-celestial.sun-hidden {
   opacity: 0 !important;
-  transform: translateY(40px) scale(0.5) !important; /* 模拟落山 */
+  transform: translateY(40px) scale(0.5) !important;
   pointer-events: none;
+  transition-delay: 0s !important;
 }
 
 /* 月亮（默认隐藏） */
@@ -376,28 +376,33 @@ body.sky-tinted.sky-night {
   right: 20%;
   z-index: 1;
   
-  /* 完美 SVG 月牙 */
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M 50 10 A 40 40 0 1 1 10 50 A 30 30 0 1 0 50 10 Z' fill='%23f0f0f0'/></svg>") !important;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
   
-  /* 默认隐藏（在下方且透明） */
   opacity: 0;
   transform: translateY(40px) scale(0.8);
-  transition: opacity 0.8s ease, transform 0.8s ease !important;
+  transition: opacity 0.5s ease, transform 0.5s ease !important;
   pointer-events: none;
+  transition-delay: 0s !important; /* 默认没延迟 */
 }
 
-/* 暗色模式下的月亮稍微暗一点 */
 [data-theme="dark"] #sky-moon {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M 50 10 A 40 40 0 1 1 10 50 A 30 30 0 1 0 50 10 Z' fill='%23b0b0b0'/></svg>") !important;
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
 }
 
-/* 晚上月亮升起显现 */
+/* 晚上月亮升起显现：延迟 0.3s 出来（等太阳落下一半再出来） */
 #sky-moon.moon-visible {
   opacity: 1 !important;
   transform: translateY(0) scale(1) !important;
+  transition-delay: 0.3s !important;
+}
+
+/* 秒切模式：用于页面初始加载或切换视图，完全取消动画 */
+.no-anim-sky #sky-celestial,
+.no-anim-sky #sky-moon {
+  transition: none !important;
 }

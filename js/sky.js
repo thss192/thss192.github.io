@@ -31,6 +31,7 @@
       return { name: "夜晚", icon: "🌙", bg: "linear-gradient(to bottom, #0F2027 0%, #203A43 100%)", isNight: true, forceWhiteText: true };
     }
 
+    // 核心渲染逻辑
     function renderSky(minutes, skyData) {
       var bgGradient = skyData.bg;
 
@@ -56,11 +57,10 @@
 
       if (iconText) iconText.textContent = skyData.icon + " " + skyData.name;
 
-      // === 核心动画逻辑 ===
-      var isDayTime = (minutes >= 360 && minutes < 1080); // 傍晚18点也属于白天黄昏，继续走抛物线
+      // 傍晚 18 点依然属于白天，太阳走抛物线
+      var isDayTime = (minutes >= 360 && minutes < 1080); 
 
       if (isDayTime) {
-        // 【白天 & 傍晚】显示太阳
         sun.classList.remove("sun-hidden");
         moon.classList.remove("moon-visible");
 
@@ -75,7 +75,6 @@
         sun.style.left = leftPos + "%";
         sun.style.right = "auto";
       } else {
-        // 【夜晚】太阳落下，月亮升起
         sun.classList.add("sun-hidden");
         moon.classList.add("moon-visible");
       }
@@ -106,6 +105,9 @@
       requestAnimationFrame(updateClock);
     }
 
+    // ====== 核心修复：初始化时禁用动画 ======
+    hero.classList.add("no-anim-sky");
+    
     updateClock();
     
     var initNow = new Date();
@@ -114,6 +116,16 @@
     else if (initMinutes >= 420 && initMinutes < 1020) currentPresetIndex = 1;
     else if (initMinutes >= 1020 && initMinutes < 1140) currentPresetIndex = 2;
     else currentPresetIndex = 3;
+
+    // 初始化完毕，立刻强制渲染一次
+    var initialSkyData = getSkyData(initMinutes);
+    renderSky(initMinutes, initialSkyData);
+
+    // 停顿一帧后，恢复过渡动画，以便后续点击时有效果
+    setTimeout(function() {
+      hero.classList.remove("no-anim-sky");
+    }, 50);
+    // ======================================
 
     var observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
