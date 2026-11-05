@@ -1,4 +1,4 @@
-﻿// 极致性能版 Particle Effects (去光晕，缓存变量，控制上限)
+﻿// 极致性能版 Particle Effects (淡蓝雪花 + 豆豆眼空心五角星 + 统一速度)
 (function () {
   const canvas = document.createElement("canvas");
   canvas.id = "effects-canvas";
@@ -12,18 +12,15 @@
   let currentEffect = localStorage.getItem("effect") || "flower";
   let currentOpacity = parseFloat(localStorage.getItem("effect_opacity") || "0.6");
 
-  // 缓存颜色，防止每帧重排（极度影响性能）
-  let cachedColor = { r: 0, g: 209, b: 178 }; // 默认薄荷绿 RGB
+  let cachedColor = { r: 0, g: 209, b: 178 }; 
   
   const updateThemeColor = () => {
     const hex = getComputedStyle(document.documentElement).getPropertyValue("--bulma-primary").trim();
     if (hex && hex.startsWith("#")) {
-      // 将 hex 转为 RGB 并缓存
       const bigint = parseInt(hex.slice(1), 16);
       cachedColor = { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
     }
   };
-  // 初始化和主题切换时更新颜色
   setTimeout(updateThemeColor, 500);
   window.__updateEffectColor = updateThemeColor;
 
@@ -34,14 +31,76 @@
   window.addEventListener("resize", resize);
   resize();
 
+  // 算法生成雪花
+  function drawSnowflake(ctx, size, alpha) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const angle = (i * Math.PI) / 3;
+      const dx = Math.sin(angle);
+      const dy = -Math.cos(angle);
+      
+      ctx.moveTo(0, 0);
+      ctx.lineTo(dx * size, dy * size);
+      
+      const branchAngle1 = angle + Math.PI / 3;
+      const branchAngle2 = angle - Math.PI / 3;
+      const bx = dx * size * 0.6;
+      const by = dy * size * 0.6;
+      
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx + Math.sin(branchAngle1) * size * 0.4, by - Math.cos(branchAngle1) * size * 0.4);
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx + Math.sin(branchAngle2) * size * 0.4, by - Math.cos(branchAngle2) * size * 0.4);
+
+      const bx2 = dx * size * 0.3;
+      const by2 = dy * size * 0.3;
+      ctx.moveTo(bx2, by2);
+      ctx.lineTo(bx2 + Math.sin(branchAngle1) * size * 0.25, by2 - Math.cos(branchAngle1) * size * 0.25);
+      ctx.moveTo(bx2, by2);
+      ctx.lineTo(bx2 + Math.sin(branchAngle2) * size * 0.25, by2 - Math.cos(branchAngle2) * size * 0.25);
+    }
+    ctx.strokeStyle = `rgba(150, 220, 255, ${alpha})`;
+    ctx.lineWidth = 1.2;
+    ctx.lineCap = "round";
+    ctx.stroke();
+  }
+
+  // 算法生成带豆豆眼的空心五角星
+  function drawEyeStar(ctx, size, alpha) {
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      ctx.lineTo(Math.cos((18 + i * 72) / 180 * Math.PI) * size, -Math.sin((18 + i * 72) / 180 * Math.PI) * size);
+      ctx.lineTo(Math.cos((54 + i * 72) / 180 * Math.PI) * size * 0.45, -Math.sin((54 + i * 72) / 180 * Math.PI) * size * 0.45);
+    }
+    ctx.closePath();
+    
+    // 1. 画星星外框 (金黄色)
+    ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`; 
+    ctx.lineWidth = 2;
+    ctx.lineJoin = "round";
+    ctx.stroke();
+
+    // 2. 画豆豆眼
+    ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+    ctx.beginPath();
+    // 左眼和右眼
+    ctx.arc(-size * 0.18, -size * 0.05, size * 0.12, 0, Math.PI * 2); 
+    ctx.arc(size * 0.18, -size * 0.05, size * 0.12, 0, Math.PI * 2);  
+    ctx.fill();
+  }
+
   class Particle {
     constructor(type, isClick) {
       this.type = type;
       this.isClick = isClick;
       this.x = isClick ? isClick.x : Math.random() * canvas.width;
       this.y = isClick ? isClick.y : -30; 
-      this.size = isClick ? Math.random() * 8 + 6 : Math.random() * 6 + 4;
       
+      this.size = isClick ? Math.random() * 8 + 6 : Math.random() * 6 + 4;
+      // 星星尺寸稍微调小一点，更有精致感
+      if (type === "meteor") this.size = Math.random() * 4 + 8; 
+      if (type === "snow") this.size = Math.random() * 5 + 4;
+
       if (isClick) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 4 + 2; 
@@ -51,13 +110,24 @@
         this.maxLife = 1500;
         this.birth = performance.now();
       } else {
-        this.vx = (Math.random() - 0.5) * 1.2;
-        this.vy = type === "star" ? Math.random() * 1 + 0.5 : Math.random() * 1.5 + 1;
-        this.decay = 0.002;
+        if (type === "meteor") {
+          // 速度完全对齐花瓣的慢速度
+          this.vx = (Math.random() - 0.5) * 1.2;
+          this.vy = Math.random() * 1.5 + 1; 
+          this.decay = 0.002;
+        } else if (type === "snow") {
+          this.vx = (Math.random() - 0.5) * 1.2;
+          this.vy = Math.random() * 0.8 + 0.5;
+          this.decay = 0.001;
+        } else {
+          this.vx = (Math.random() - 0.5) * 1.2;
+          this.vy = Math.random() * 1.5 + 1;
+          this.decay = 0.002;
+        }
       }
       this.life = 1;
       this.rotation = Math.random() * Math.PI * 2;
-      this.rotSpeed = (Math.random() - 0.5) * 0.04;
+      this.rotSpeed = (Math.random() - 0.5) * 0.03;
     }
 
     update(now) {
@@ -77,27 +147,35 @@
     }
 
     draw() {
-      const alpha = Math.max(0, this.life) * currentOpacity;
+      let alpha = Math.max(0, this.life) * currentOpacity;
       if (alpha <= 0) return;
+
+      const { r, g, b } = cachedColor;
 
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rotation);
 
-      // 性能优化：直接用 rgba 渲染，不再使用 globalAlpha
-      const { r, g, b } = cachedColor;
-
       if (this.type === "star") {
-        // 双层绘制模拟发光（极速）
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.4})`;
-        ctx.beginPath(); ctx.arc(0, 0, this.size * 0.5, 0, Math.PI * 2); ctx.fill();
-
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${alpha * 0.8})`;
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        
         ctx.beginPath();
         const s = this.size;
-        ctx.moveTo(0, -s); ctx.quadraticCurveTo(0, 0, s, 0);
-        ctx.quadraticCurveTo(0, 0, 0, s); ctx.quadraticCurveTo(0, 0, -s, 0);
-        ctx.quadraticCurveTo(0, 0, 0, -s); ctx.fill();
+        ctx.moveTo(0, -s);
+        ctx.quadraticCurveTo(s * 0.15, -s * 0.15, s, 0);
+        ctx.quadraticCurveTo(s * 0.15, s * 0.15, 0, s);
+        ctx.quadraticCurveTo(-s * 0.15, s * 0.15, -s, 0);
+        ctx.quadraticCurveTo(-s * 0.15, -s * 0.15, 0, -s);
+        ctx.fill();
+        
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.6})`;
+        ctx.beginPath();
+        ctx.arc(0, 0, s * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
       } else if (this.type === "heart") {
         ctx.fillStyle = `rgba(255, 77, 109, ${alpha})`;
         ctx.beginPath();
@@ -118,6 +196,10 @@
           ctx.quadraticCurveTo(-this.size * 0.3, -this.size * 0.5, 0, 0);
         }
         ctx.fill();
+      } else if (this.type === "snow") {
+        drawSnowflake(ctx, this.size, alpha);
+      } else if (this.type === "meteor") {
+        drawEyeStar(ctx, this.size, alpha);
       }
       ctx.restore();
     }
@@ -126,10 +208,16 @@
   const loop = (now) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // 性能优化：背景粒子数量上限 60，点击粒子上限 100
     const bgCount = particles.filter(p => !p.isClick).length;
-    if (currentEffect !== "none" && bgCount < 60 && Math.random() < 0.08) {
-      particles.push(new Particle(currentEffect, null));
+    
+    if (currentEffect !== "none" && bgCount < 80) {
+      if (currentEffect === "meteor") {
+        if (Math.random() < 0.05) particles.push(new Particle(currentEffect, null));
+      } else if (currentEffect === "snow") {
+        if (Math.random() < 0.15) particles.push(new Particle(currentEffect, null));
+      } else {
+        if (Math.random() < 0.08) particles.push(new Particle(currentEffect, null));
+      }
     }
 
     for (let i = particles.length - 1; i >= 0; i--) {
@@ -146,7 +234,6 @@
     if (currentEffect === "none") return;
     if (e.target.closest("button") || e.target.closest("a") || e.target.closest("input")) return;
 
-    // 性能优化：防止狂点导致卡顿
     const clickCount = particles.filter(p => p.isClick).length;
     if (clickCount > 100) return;
 

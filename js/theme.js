@@ -14,6 +14,8 @@
     { id: "star",   label: "星空", icon: "fa-star" },
     { id: "heart",  label: "爱心", icon: "fa-heart" },
     { id: "flower", label: "花朵", icon: "fa-fan" },
+    { id: "snow",   label: "雪花", icon: "fa-snowflake" },
+    { id: "meteor", label: "流星", icon: "fa-meteor" },
   ];
   
   const KEY_MODE = "theme";
@@ -81,7 +83,7 @@
         <div class="palette-grid">${paletteHtml}</div>
         <div class="panel-divider"></div>
         <p class="panel-title">页面特效</p>
-        <div class="effect-grid">${effectHtml}</div>
+        <div class="effect-grid" style="grid-template-columns: repeat(3, 1fr);">${effectHtml}</div>
         <div class="opacity-row">
           <span>透明度</span>
           <input type="range" id="effect-opacity" min="0" max="1" step="0.1" value="${opacity}">
@@ -125,7 +127,6 @@
       }
     });
 
-    // 监听滑块拖动
     const slider = document.getElementById("effect-opacity");
     slider.addEventListener("input", (e) => {
       if (window.__setEffectOpacity) window.__setEffectOpacity(e.target.value);
@@ -143,4 +144,3 @@
     init();
   }
 })();
-
