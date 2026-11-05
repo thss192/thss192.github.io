@@ -69,13 +69,13 @@
   <script src="js/sky.js" defer></script>
   <script src="js/theme.js" defer></script>
 
-  <!-- 核心修复：执行布局渲染 + 动态加载 Giscus -->
+  <!-- 核心逻辑：执行布局渲染 + 动态加载 Giscus + 完美主题同步 -->
   <script>
     document.addEventListener("DOMContentLoaded", async function() {
       // 1. 初始化公共布局（导航栏、页脚、搜索框）
       await initLayout("guestbook.html");
       
-      // 2. 动态注入 Giscus 脚本（确保它挂载到我们指定的容器里）
+      // 2. 动态注入 Giscus 脚本
       const giscusScript = document.createElement("script");
       giscusScript.src = "https://giscus.app/client.js";
       giscusScript.setAttribute("data-repo", "thss192/thss192.github.io");
@@ -87,27 +87,36 @@
       giscusScript.setAttribute("data-reactions-enabled", "1");
       giscusScript.setAttribute("data-emit-metadata", "0");
       giscusScript.setAttribute("data-input-position", "bottom");
-      giscusScript.setAttribute("data-theme", "https://gist.githubusercontent.com/thss192/f0029e372a7ef9bcb3b4ffb2edefef20/raw/0884e90cdd9becc9e685d65ee7870d97ec6940d6/giscus-theme.css");
+      // 初始我们给一个透明深色主题，防止它默认加载成灰白色
+      giscusScript.setAttribute("data-theme", "transparent_dark");
       giscusScript.setAttribute("data-lang", "zh-CN");
       giscusScript.setAttribute("crossorigin", "anonymous");
       giscusScript.async = true;
       
       document.getElementById("giscus-mount").appendChild(giscusScript);
 
-      // 3. 监听博客的主题切换，同步给 Giscus
+      // 3. 定义一个强力的主题同步函数
+      const syncThemeToGiscus = () => {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        const theme = isDark ? "transparent_dark" : "light";
+        
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (iframe) {
+          iframe.contentWindow.postMessage(
+            { giscus: { setConfig: { theme: theme } } },
+            'https://giscus.app'
+          );
+        }
+      };
+
+      // 4. 核心修复：页面刚加载时，iframe 还没准备好，我们延迟 1 秒后强推一次主题
+      setTimeout(syncThemeToGiscus, 1000);
+
+      // 5. 监听博客的主题切换（点击左下角按钮时实时同步）
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (mutation.attributeName === "data-theme") {
-            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-            const theme = isDark ? "transparent_dark" : "light";
-            
-            const iframe = document.querySelector('iframe.giscus-frame');
-            if (iframe) {
-              iframe.contentWindow.postMessage(
-                { giscus: { setConfig: { theme: theme } } },
-                'https://giscus.app'
-              );
-            }
+            syncThemeToGiscus();
           }
         });
       });
