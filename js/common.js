@@ -251,6 +251,30 @@ async function initLayout(page) {
   renderFooter(config);
   initSearchModal();
   
+  // ===== 新增：自动设置浏览器标签页标题 =====
+  try {
+    const siteTitle = config.siteTitle || "我的博客";
+    // 将传入的 "posts.html" 或 "index.html" 转为 "postsPage" 或 "indexPage"
+    const pageKey = page.replace(".html", "Page"); 
+    const pageCopy = (config.pageCopy || {});
+    
+    // 尝试从对应的页面配置里拿 browserTitle，如果没有就拿网站总标题
+    const browserTitle = pageCopy[pageKey] && pageCopy[pageKey].browserTitle 
+      ? pageCopy[pageKey].browserTitle 
+      : "";
+
+    if (browserTitle) {
+      document.title = `${browserTitle} · ${siteTitle}`;
+    } else if (page === "index.html") {
+      document.title = siteTitle;
+    } else {
+      document.title = `${siteTitle} · ${siteTitle}`; // 兜底
+    }
+  } catch (e) {
+    console.warn("设置标题失败", e);
+  }
+  // ===========================================
+
   const pc404 = (config.pageCopy || {}).page404 || {};
   const ec = document.getElementById("error-code");
   const et = document.getElementById("error-title");

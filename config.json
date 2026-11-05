@@ -1,7 +1,7 @@
 {
-  "siteTitle": "我的个人博客",
+  "siteTitle": "(xwxマⳊ喵~life",
   "siteSubtitle": "记录代码与生活",
-  "siteUrl": "https://thss192.github.io",
+  "siteUrl": "https://xwx.life",
   "author": {
     "name": "巳🌿🐟",
     "bio": "未知项目的开发者。",
@@ -52,13 +52,22 @@
   },
   "defaultSort": "asc",
   "hero": {
-    "title": "你好，欢迎来到我的技术博客 🌱",
-    "subtitle": "记录代码、思考与生活的碎片。"
+    "title": "(xwx)你好喵~",
+    "subtitle": "这是拼凑代码、思考与生活的碎片的地方哦。"
   },
-  "pageCopy": {
+    "pageCopy": {
+    "indexPage": {
+      "browserTitle": "首页"
+    },
+    "postsPage": {
+      "title": "全部文章",
+      "subtitle": "记录代码、思考与生活的碎片。",
+      "browserTitle": "文章"
+    },
     "projectsPage": {
       "title": "开源项目",
-      "subtitle": "这里记录了我做过的一些开源项目与实战作品。"
+      "subtitle": "这里记录了我做过的一些开源项目与实战作品。",
+      "browserTitle": "项目"
     },
     "linksPage": {
       "title": "连接",
@@ -66,21 +75,23 @@
       "neighborsTitle": "我的邻居们",
       "mySitesTitle": "我的阵地",
       "exchangeTitle": "交换友链？",
-      "exchangeNote": "如果你也有自己的博客，欢迎发邮件与我交换友链！"
+      "exchangeNote": "如果你也有自己的博客，欢迎发邮件与我交换友链！",
+      "browserTitle": "友链"
     },
     "aboutPage": {
       "title": "关于我",
-      "subtitle": "探索代码与生活的边界"
-    },
-    "postsPage": {
-      "title": "全部文章",
-      "subtitle": "记录代码、思考与生活的碎片。"
+      "subtitle": "探索代码与生活的边界",
+      "browserTitle": "关于"
     },
     "page404": {
       "code": "404",
       "title": "哎呀，页面走丢了...",
       "description": "你要找的页面可能被外星人抓走了，或者你输入了错误的地址。",
-      "backHome": "返回首页"
+      "backHome": "返回首页",
+      "browserTitle": "页面走丢了"
+    },
+    "postPage": {
+      "browserTitle": "文章"
     }
   },
   "postLicense": {
