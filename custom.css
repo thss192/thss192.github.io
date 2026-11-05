@@ -434,3 +434,18 @@ body.sky-tinted.sky-night {
   border-color: var(--bulma-primary);
   color: var(--bulma-primary);
 }
+/* ===== 导航栏站点名主题色渐变 ===== */
+#site-navbar .navbar-brand .navbar-item strong {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  
+  /* 核心：使用主题色生成渐变文字 */
+  background: linear-gradient(135deg, var(--bulma-primary) 0%, var(--bulma-primary-bold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--bulma-primary); /* 兜底 */
+  
+
+}
