@@ -102,7 +102,7 @@ function buildHomeData(posts) {
 function renderCard(post) {
   const tags = (post.tags || []).map(t => `<span class="tag is-info is-light">${t}</span>`).join("");
   return `
-    <a class="timeline-card" href="post.html?slug=${encodeURIComponent(post.slug)}">
+    <a class="timeline-card" href="post?slug=${encodeURIComponent(post.slug)}">
       <div class="timeline-card-title">${post.title}</div>
       ${post.summary ? `<div class="timeline-card-summary">${post.summary}</div>` : ""}
       <div class="timeline-card-meta">

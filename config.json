@@ -24,13 +24,13 @@
       "contactTitle": "联系我"
     }
   },
- "nav": [
-    { "label": "首页", "href": "index.html" },
-    { "label": "文章", "href": "posts.html" },
-    { "label": "留言板", "href": "guestbook.html" },
-    { "label": "项目", "href": "projects.html" },
-    { "label": "友链", "href": "links.html" },
-    { "label": "关于", "href": "about.html" }
+  "nav": [
+    { "label": "首页", "href": "index" },
+    { "label": "文章", "href": "posts" },
+    { "label": "留言板", "href": "guestbook" },
+    { "label": "项目", "href": "projects" },
+    { "label": "友链", "href": "links" },
+    { "label": "关于", "href": "about" }
   ],
   "social": [
     {

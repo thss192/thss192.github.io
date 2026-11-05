@@ -121,7 +121,7 @@ async function renderPostNav(currentSlug) {
 
     const prevHtml = prev
       ? `<div class="column is-6">
-           <a class="box is-block" href="post.html?slug=${encodeURIComponent(prev.slug)}">
+           <a class="box is-block" href="post?slug=${encodeURIComponent(prev.slug)}">
              <p class="is-size-7 has-text-grey">${prevText}${seriesLabel}</p>
              <p class="has-text-weight-semibold">${prev.title}</p>
            </a>
@@ -130,7 +130,7 @@ async function renderPostNav(currentSlug) {
 
     const nextHtml = next
       ? `<div class="column is-6">
-           <a class="box is-block has-text-right" href="post.html?slug=${encodeURIComponent(next.slug)}">
+           <a class="box is-block has-text-right" href="post?slug=${encodeURIComponent(next.slug)}">
              <p class="is-size-7 has-text-grey">${nextText}${seriesLabel}</p>
              <p class="has-text-weight-semibold">${next.title}</p>
            </a>

@@ -136,7 +136,7 @@ function initSearchModal() {
       resultsEl.innerHTML = `<ul class="menu-list">
         ${matches.map(p => `
           <li class="mb-3">
-            <a href="post.html?slug=${encodeURIComponent(p.slug)}" class="is-size-6 has-text-weight-semibold">
+            <a href="post?slug=${encodeURIComponent(p.slug)}" class="is-size-6 has-text-weight-semibold">
               ${p.titleHtml}
             </a>
             ${p.snippetHtml ? `<p class="is-size-7 has-text-grey mt-1 ml-2">${p.snippetHtml}</p>` : ""}

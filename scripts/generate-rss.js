@@ -11,7 +11,7 @@ const SITE_URL = config.siteUrl || "https://your-domain.com";
 
 let items = "";
 indexJson.forEach(post => {
-  const url = `${SITE_URL}/post.html?slug=${post.slug}`;
+  const url = `${SITE_URL}/post?slug=${post.slug}`;
   items += `
     <item>
       <title><![CDATA[${post.title}]]></title>

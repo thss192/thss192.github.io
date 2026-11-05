@@ -1,4 +1,4 @@
-// dev.js - 零依赖的本地开发服务器 + 全目录监听 + 自动刷新
+// dev.js - 零依赖的本地开发服务器 + 全目录监听 + 自动刷新 + 无后缀路由支持
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -27,41 +27,66 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   let urlPath = req.url.split("?")[0];
   if (urlPath === "/") urlPath = "/index.html";
-  const filePath = path.join(ROOT, decodeURIComponent(urlPath));
+  
+  let filePath = path.join(ROOT, decodeURIComponent(urlPath));
+  
+  // 【新增】：如果访问的路径没有扩展名（比如 /index 或 /posts），自动补全 .html
+  if (!path.extname(filePath)) {
+    filePath += ".html";
+  }
   
   fs.readFile(filePath, (err, data) => {
     if (err) {
+      // 如果补全 .html 后还找不到，再尝试找对应文件夹下的 index.html
+      if (err.code === 'ENOENT') {
+        const fallbackPath = path.join(ROOT, decodeURIComponent(urlPath), "index.html");
+        fs.readFile(fallbackPath, (err2, data2) => {
+          if (!err2) {
+            serveFile(req, res, fallbackPath, data2);
+            return;
+          }
+          res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+          res.end("404 Not Found");
+        });
+        return;
+      }
       res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
       res.end("404 Not Found");
       return;
     }
-    const ext = path.extname(filePath).toLowerCase();
-    const contentType = MIME_TYPES[ext] || "application/octet-stream";
     
-    // 注入自动刷新代码
-    if (ext === ".html") {
-      let html = data.toString("utf8");
-      const reloadScript = `
-        <script>
-          (function() {
-            const ws = new WebSocket('ws://' + location.host);
-            ws.onmessage = function(e) {
-              if (e.data === 'reload') {
-                console.log('🔄 检测到文件变动，自动刷新页面...');
-                location.reload();
-              }
-            };
-          })();
-        </script>
-      `;
-      html = html.replace("</body>", reloadScript + "</body>");
-      data = Buffer.from(html, "utf8");
-    }
-
-    res.writeHead(200, { "Content-Type": contentType, "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate" });
-    res.end(data);
+    serveFile(req, res, filePath, data);
   });
 });
+
+// 提取出公共的返回文件逻辑（处理 HTML 注入等）
+function serveFile(req, res, filePath, data) {
+  const ext = path.extname(filePath).toLowerCase();
+  const contentType = MIME_TYPES[ext] || "application/octet-stream";
+  
+  // 注入自动刷新代码
+  if (ext === ".html") {
+    let html = data.toString("utf8");
+    const reloadScript = `
+      <script>
+        (function() {
+          const ws = new WebSocket('ws://' + location.host);
+          ws.onmessage = function(e) {
+            if (e.data === 'reload') {
+              console.log('🔄 检测到文件变动，自动刷新页面...');
+              location.reload();
+            }
+          };
+        })();
+      </script>
+    `;
+    html = html.replace("</body>", reloadScript + "</body>");
+    data = Buffer.from(html, "utf8");
+  }
+
+  res.writeHead(200, { "Content-Type": contentType, "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate" });
+  res.end(data);
+}
 
 // 2. WebSocket 广播机制
 let wsClients = [];
