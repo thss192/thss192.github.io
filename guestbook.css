@@ -48,7 +48,5 @@
   color-scheme: none !important;
   position: relative;
   z-index: 2;
-  /* 使用 clip-path 裁剪掉底部"退出登录"的白边 */
-  clip-path: inset(0 0 40px 0);
-  margin-bottom: -40px;
+  /* 删除了 clip-path 和 margin-bottom，让底部按钮完整显示 */
 }
