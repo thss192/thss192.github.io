@@ -89,9 +89,10 @@ function renderSidebar(data) {
   const inner = document.getElementById("posts-sidebar-inner");
   
   if (CURRENT_VIEW === "time") {
+    // 时间模式：全部时间 + 按年分组全部展开
     let html = `
       <div class="sidebar-cat-group">
-        <button class="post-nav-item ${ACTIVE_CAT_KEY === 'all' ? 'is-active' : ''}" data-key="all" style="margin-bottom: 0.5rem;">
+        <button class="post-nav-item ${ACTIVE_CAT_KEY === 'all' ? 'is-active' : ''}" data-key="all">
           <span class="icon is-small mr-1"><i class="fas fa-clock"></i></span>
           <span>全部时间</span>
           <span class="count">${ALL_POSTS.length}</span>
@@ -107,15 +108,16 @@ function renderSidebar(data) {
       }
       html += `
         <button class="post-nav-item ${ACTIVE_CAT_KEY === g.key ? 'is-active' : ''}" data-key="${g.key}">
-          <span style="padding-left: 0.5rem;">${g.label}</span>
+          <span style="padding-left: 1.25rem;">${g.label}</span>
           <span class="count">${g.posts.length}</span>
         </button>
       `;
     });
     inner.innerHTML = html;
   } else {
+    // 系列模式：所有大类和子系列全展开
     let html = `
-      <div class="sidebar-cat-group" style="margin-bottom: 0.5rem;">
+      <div class="sidebar-cat-group">
         <button class="sidebar-cat-btn ${ACTIVE_CAT_KEY === 'all' ? 'is-active' : ''}" data-cat="all">
           <span class="icon is-small"><i class="fas fa-layer-group"></i></span>
           <span>全部</span>
@@ -150,6 +152,7 @@ function renderSidebar(data) {
     inner.innerHTML = html;
   }
 
+  // 绑定事件
   const checkAndCollapse = () => {
     if (window.innerWidth <= 900) {
       document.getElementById("posts-workspace").classList.add("is-collapsed");
@@ -191,6 +194,7 @@ function renderMainContent(data) {
 
   if (CURRENT_VIEW === "time") {
     if (ACTIVE_CAT_KEY === "all") {
+      // 全部时间
       let html = `<div class="time-view-container">`;
       data.forEach(g => {
         html += `
@@ -208,6 +212,7 @@ function renderMainContent(data) {
       html += `</div>`;
       main.innerHTML = html;
     } else {
+      // 单个月份
       const currentIndex = data.findIndex(g => g.key === ACTIVE_CAT_KEY);
       if (currentIndex === -1) return;
       
@@ -248,6 +253,7 @@ function renderMainContent(data) {
       `;
     }
   } else {
+    // 系列模式
     let html = "";
     if (ACTIVE_CAT_KEY === "all") {
       data.forEach(cat => {
@@ -308,7 +314,7 @@ function renderCard(post) {
     </a>`;
 }
 
-/* ================= URL 逻辑与精准滚动 ================= */
+/* ================= URL 逻辑 ================= */
 function updateURL(params) {
   const url = new URL(window.location);
   if (params.view) url.searchParams.set("view", params.view);
@@ -320,10 +326,10 @@ function updateURL(params) {
   window.history.pushState({}, "", url);
   applyStateFromURL();
   
-  // 精准滚动：计算 Hero 高度，保证刚好停留在文章区
+  // 滚动精准定位在 Hero 下方
   const heroEl = document.querySelector(".hero-sky");
   if (heroEl) {
-    const yOffset = -80; // 导航栏高度
+    const yOffset = -80; 
     const y = heroEl.offsetTop + heroEl.offsetHeight + yOffset;
     window.scrollTo({ top: y > 0 ? y : 0, behavior: "smooth" });
   }

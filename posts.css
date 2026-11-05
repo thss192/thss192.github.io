@@ -392,3 +392,77 @@
   .category-wrapper { padding: 1rem 1rem 0 1rem; }
   .posts-subgroup { padding: 0.75rem; margin-bottom: 1.5rem; }
 }
+
+/* ==========================================================================
+   时间模式左侧菜单修复
+   ========================================================================== */
+
+/* 确保左侧所有包裹容器占满宽度 */
+.sidebar-cat-group {
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
+/* 让时间模式的按钮和系列模式一样舒展 */
+.post-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 让文字和数字分居两端 */
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--bulma-radius);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--bulma-text);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.post-nav-item:hover { background: var(--bulma-scheme-main-ter); }
+.post-nav-item.is-active { color: var(--bulma-primary); background: var(--bulma-primary-soft); }
+
+/* 数字药丸 (那个 7 的样式) */
+.post-nav-item .count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.45rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--bulma-text-light);
+  background: var(--bulma-scheme-main-ter);
+  border-radius: var(--bulma-radius-rounded);
+  margin-left: 0.5rem;
+  transition: all 0.2s ease;
+}
+[data-theme="dark"] .post-nav-item .count {
+  background: var(--bg-dark-card-hover);
+}
+
+.post-nav-item.is-active .count {
+  background: var(--bulma-primary);
+  color: var(--bulma-primary-invert);
+}
+
+/* 年份标题优化 */
+.post-nav-year {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--bulma-text-light);
+  padding: 1rem 0.75rem 0.35rem;
+  margin-top: 0.5rem;
+  border-top: 1px dashed var(--bulma-border-weak);
+}
+.post-nav-year:first-of-type {
+  margin-top: 0;
+  border-top: none;
+}
+[data-theme="dark"] .post-nav-year {
+  border-top-color: var(--border-dark);
+}
