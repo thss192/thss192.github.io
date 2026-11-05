@@ -466,3 +466,17 @@
 [data-theme="dark"] .post-nav-year {
   border-top-color: var(--border-dark);
 }
+
+/* 新增：显示该分类全部按钮的样式 */
+.show-all-btn {
+  margin-top: 0.5rem;
+  background-color: var(--bulma-primary-soft) !important;
+  border-color: transparent !important;
+  color: var(--bulma-primary) !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.show-all-btn:hover {
+  background-color: var(--bulma-primary) !important;
+  color: var(--bulma-primary-invert) !important;
+}

@@ -1,4 +1,4 @@
-// 统一文章页：强制左右侧边栏，全树状目录展开，时间模式支持上下月切换
+// 统一文章页：强制左右侧边栏，优雅折叠，支持全部
 let ALL_POSTS = [];
 let CURRENT_VIEW = "series"; 
 let ACTIVE_CAT_KEY = null;
@@ -89,7 +89,6 @@ function renderSidebar(data) {
   const inner = document.getElementById("posts-sidebar-inner");
   
   if (CURRENT_VIEW === "time") {
-    // 时间模式：全部时间 + 按年分组全部展开
     let html = `
       <div class="sidebar-cat-group">
         <button class="post-nav-item ${ACTIVE_CAT_KEY === 'all' ? 'is-active' : ''}" data-key="all">
@@ -115,7 +114,6 @@ function renderSidebar(data) {
     });
     inner.innerHTML = html;
   } else {
-    // 系列模式：所有大类和子系列全展开
     let html = `
       <div class="sidebar-cat-group">
         <button class="sidebar-cat-btn ${ACTIVE_CAT_KEY === 'all' ? 'is-active' : ''}" data-cat="all">
@@ -152,11 +150,13 @@ function renderSidebar(data) {
     inner.innerHTML = html;
   }
 
-  // 绑定事件
-  const checkAndCollapse = () => {
+    const checkAndCollapse = () => {
     if (window.innerWidth <= 900) {
+      // 先收起目录
       document.getElementById("posts-workspace").classList.add("is-collapsed");
       localStorage.setItem("postsSidebarCollapsed", "true");
+      // 强制让右侧重新渲染一次，这样它才能检测到目录已收起，从而渲染出“显示该分类全部”按钮
+      setTimeout(() => applyStateFromURL(), 10);
     }
   };
 
@@ -194,7 +194,6 @@ function renderMainContent(data) {
 
   if (CURRENT_VIEW === "time") {
     if (ACTIVE_CAT_KEY === "all") {
-      // 全部时间
       let html = `<div class="time-view-container">`;
       data.forEach(g => {
         html += `
@@ -212,7 +211,6 @@ function renderMainContent(data) {
       html += `</div>`;
       main.innerHTML = html;
     } else {
-      // 单个月份
       const currentIndex = data.findIndex(g => g.key === ACTIVE_CAT_KEY);
       if (currentIndex === -1) return;
       
@@ -277,16 +275,32 @@ function renderMainContent(data) {
     } else {
       const currentGroup = data.find(g => g.key === ACTIVE_CAT_KEY);
       if (!currentGroup) return;
+
+      // 核心修改：判断是否选中了单一子系列，以及目录是否收起
+      const isSpecificSeries = ACTIVE_SERIES_KEY !== "all";
+      const isCollapsed = document.getElementById("posts-workspace").classList.contains("is-collapsed");
+      
+      const catTitle = isSpecificSeries ? `${currentGroup.name} (${ACTIVE_SERIES_KEY})` : currentGroup.name;
+      const showAllBtnHtml = (isSpecificSeries && isCollapsed) ? `
+        <a href="javascript:void(0)" onclick="updateURL({ category: '${currentGroup.key}', series: 'all' })" class="button is-small is-rounded is-light mt-2 show-all-btn">
+          <span class="icon is-small"><i class="fas fa-layer-group"></i></span>
+          <span>显示该分类全部</span>
+        </a>
+      ` : "";
+
       html += `
         <div class="category-wrapper">
-          <div class="category-header">
-            <h2 class="category-title">${currentGroup.name}</h2>
+          <div class="category-header" style="display: flex; flex-direction: column; align-items: flex-start;">
+            <h2 class="category-title">${catTitle}</h2>
+            ${showAllBtnHtml}
           </div>
           <div class="category-body">
       `;
-      const subsToShow = ACTIVE_SERIES_KEY === "all" 
-        ? currentGroup.children 
-        : currentGroup.children.filter(c => c.name === ACTIVE_SERIES_KEY);
+      
+      const subsToShow = isSpecificSeries 
+        ? currentGroup.children.filter(c => c.name === ACTIVE_SERIES_KEY)
+        : currentGroup.children;
+
       subsToShow.forEach(sub => {
         html += `
           <section class="posts-subgroup">
@@ -326,7 +340,6 @@ function updateURL(params) {
   window.history.pushState({}, "", url);
   applyStateFromURL();
   
-  // 滚动精准定位在 Hero 下方
   const heroEl = document.querySelector(".hero-sky");
   if (heroEl) {
     const yOffset = -80; 
@@ -401,11 +414,15 @@ async function initPosts() {
   btnToggle.addEventListener("click", () => {
     workspace.classList.add("is-collapsed");
     localStorage.setItem("postsSidebarCollapsed", "true");
+    // 收起目录时，重新渲染内容以显示“显示全部”按钮
+    applyStateFromURL();
   });
 
   btnExpand.addEventListener("click", () => {
     workspace.classList.remove("is-collapsed");
     localStorage.setItem("postsSidebarCollapsed", "false");
+    // 展开目录时，重新渲染内容以隐藏“显示全部”按钮
+    applyStateFromURL();
   });
 
   window.addEventListener("popstate", applyStateFromURL);
