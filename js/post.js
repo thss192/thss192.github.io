@@ -42,6 +42,7 @@ function calcReadTime(text) {
 
 function generateTOC() {
   const tocList = document.getElementById("toc-list");
+  // 排除 Mermaid 容器里的内容
   const headings = document.querySelectorAll("#post-body h2, #post-body h3");
   
   if (!headings.length) {
@@ -293,7 +294,12 @@ async function initPost() {
   document.title = `${pageTitle} · 我的博客`;
 
   if (location.protocol === "file:") {
-    // ... 原有的 file 协议处理 ...
+    statusEl.innerHTML = `<div class="notification is-warning mt-4"><strong>本地双击预览受限：</strong> 浏览器安全策略禁止在 <code>file://</code> 下读取 .md 文件。<br />建议使用本地服务器预览（如 <code>python -m http.server 8000</code>）。</div>`;
+    if (slug === "hello-world") {
+      renderContent("你好，世界", "2025-01-01", ["随笔", "开始"], `# 你好，世界\n\n欢迎来到我的博客。这是第一篇文章。\n\n## 功能特性\n\n- 支持 **Markdown**\n- 支持 \`代码\`\n\n\`\`\`js\nconsole.log("Hello, Bulma!");\n\`\`\``);
+    } else {
+      document.getElementById("post-body").innerHTML = "<p class='has-text-danger'>无法加载正文。</p>";
+    }
     return;
   }
 
@@ -303,8 +309,6 @@ async function initPost() {
     const raw = await res.text();
     const { meta, body } = parseFrontMatter(raw);
     
-    // 注意这里：不再在获取 meta 之后立刻重新渲染导航栏
-    // 而是等 renderContent 内部把进度算好后，再刷新导航栏
     renderContent(meta.title || slug, meta.date || "", meta.tags || [], body, meta);
   } catch (e) {
     statusEl.innerHTML = `<div class="notification is-danger">读取文章失败：${e.message}</div>`;
@@ -315,8 +319,41 @@ function renderContent(title, date, tags, rawBody, meta) {
   const headerEl = document.getElementById("post-header");
   const bodyEl = document.getElementById("post-body");
   
-  // 1. 先将 Markdown 渲染成 HTML，以便进行精准统计
   bodyEl.innerHTML = marked.parse(rawBody);
+
+  // ================= 新增：处理 Mermaid 流程图 =================
+  const mermaidBlocks = bodyEl.querySelectorAll("pre code.language-mermaid");
+  if (mermaidBlocks.length > 0) {
+    // 1. 初始化 Mermaid
+    if (typeof mermaid !== "undefined") {
+      // 根据当前主题设置 Mermaid 的主题
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: isDark ? "dark" : "default",
+        securityLevel: "loose"
+      });
+    }
+
+    // 2. 把 marked 解析出的 <pre><code> 替换成 <div class="mermaid">
+    mermaidBlocks.forEach(codeBlock => {
+      const pre = codeBlock.parentNode; // 获取 <pre>
+      const container = document.createElement("div");
+      container.className = "mermaid-container"; // 方便自定义外框样式
+      container.innerHTML = `<div class="mermaid">${codeBlock.textContent}</div>`;
+      
+      // 替换节点
+      pre.parentNode.replaceChild(container, pre);
+    });
+
+    // 3. 触发 Mermaid 渲染
+    if (typeof mermaid !== "undefined") {
+      mermaid.run({
+        nodes: bodyEl.querySelectorAll(".mermaid")
+      }).catch(err => console.error("Mermaid 渲染失败:", err));
+    }
+  }
+  // ==========================================================
 
   // 2. 精准统计代码块数量 (直接找渲染后的 <pre> 标签)
   const codeBlocks = bodyEl.querySelectorAll("pre").length;
@@ -328,6 +365,7 @@ function renderContent(title, date, tags, rawBody, meta) {
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = bodyEl.innerHTML;
   tempDiv.querySelectorAll("pre").forEach(pre => pre.remove());
+  tempDiv.querySelectorAll(".mermaid-container").forEach(el => el.remove()); // 流程图也不计入字数
   const textLength = tempDiv.textContent.replace(/\s+/g, "").length;
 
   const readTime = calcReadTime(rawBody);
@@ -340,7 +378,9 @@ function renderContent(title, date, tags, rawBody, meta) {
     if (currentIndex !== -1) {
       meta.seriesIndex = currentIndex + 1;
       meta.seriesTotal = seriesPosts.length;
-      window.__CURRENT_POST_META__ = meta; // 实时更新供导航栏使用
+      window.__CURRENT_POST_META__ = meta; 
+      
+      // 数据算好后，强制重新渲染一次导航栏
       if (typeof renderNavbar === "function" && window.__CONFIG__) {
         renderNavbar(window.__CONFIG__, "post.html");
       }
@@ -352,7 +392,7 @@ function renderContent(title, date, tags, rawBody, meta) {
     .map(t => `<a href="javascript:void(0)" onclick="openTagDrawer('${encodeURIComponent(t)}')" class="tag is-info is-light mr-1 is-clickable">${t}</a>`)
     .join("");
     
-  // 6. 渲染头部（去掉了原本的胶囊系列进度）
+  // 6. 渲染头部
   headerEl.innerHTML = `
     <h1 class="title is-2">${title}</h1>
     <p class="subtitle is-6 has-text-grey mb-3">

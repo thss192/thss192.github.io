@@ -381,3 +381,33 @@
 [data-theme="dark"] .series-indicator strong {
   color: #fff;
 }
+
+/* ==========================================================================
+   14. Mermaid 流程图容器
+   ========================================================================== */
+.mermaid-container {
+  margin: 1.5em 0;
+  padding: 1.5rem;
+  background: var(--bulma-scheme-main-bis);
+  border: 1px solid var(--bulma-border-weak);
+  border-radius: var(--bulma-radius-large);
+  /* 【修复】：去掉 flex 居中，改用 overflow-x 和 text-align */
+  overflow-x: auto;
+  text-align: center;
+}
+[data-theme="dark"] .mermaid-container {
+  background: var(--bg-dark-card-hover);
+  border-color: var(--border-dark);
+}
+
+/* 针对 Mermaid 生成的 SVG 专门修复 */
+.mermaid-container svg {
+  display: inline-block !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* 清除 Bulma 对 .content 内部 svg 的默认干扰 */
+#post-body .mermaid-container svg {
+  margin: 0 auto;
+}
