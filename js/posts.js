@@ -1,4 +1,4 @@
-// 统一文章页：强制左右侧边栏，优雅折叠，支持全部
+// 统一文章页：强制左右侧边栏，优雅折叠，支持全部，分类标签聚合
 let ALL_POSTS = [];
 let CURRENT_VIEW = "series"; 
 let ACTIVE_CAT_KEY = null;
@@ -38,20 +38,42 @@ function getSeriesData() {
     const catData = tree.get(cat);
     const children = [];
     let totalCount = catData.directPosts.length;
+    const catTags = new Set();
     
     const sortedSubs = Array.from(catData.subMap.keys()).sort((a, b) => a.localeCompare(b, "zh"));
     sortedSubs.forEach(sub => {
       const posts = catData.subMap.get(sub).sort((a, b) => new Date(b.date) - new Date(a.date));
-      children.push({ name: sub, posts: posts });
+      
+      const subTags = new Set();
+      posts.forEach(p => (p.tags || []).forEach(t => {
+        subTags.add(t);
+        catTags.add(t);
+      }));
+
+      children.push({ name: sub, posts: posts, tags: Array.from(subTags).sort() });
       totalCount += posts.length;
     });
 
     if (catData.directPosts.length > 0) {
       const posts = catData.directPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
-      children.push({ name: "综合文章", posts: posts });
+      
+      const subTags = new Set();
+      posts.forEach(p => (p.tags || []).forEach(t => {
+        subTags.add(t);
+        catTags.add(t);
+      }));
+
+      children.push({ name: "综合文章", posts: posts, tags: Array.from(subTags).sort() });
+      totalCount += posts.length;
     }
 
-    result.push({ key: cat, name: cat, children: children, totalCount: totalCount });
+    result.push({ 
+      key: cat, 
+      name: cat, 
+      children: children, 
+      totalCount: totalCount,
+      tags: Array.from(catTags).sort()
+    });
   });
 
   return result;
@@ -150,12 +172,10 @@ function renderSidebar(data) {
     inner.innerHTML = html;
   }
 
-    const checkAndCollapse = () => {
+  const checkAndCollapse = () => {
     if (window.innerWidth <= 900) {
-      // 先收起目录
       document.getElementById("posts-workspace").classList.add("is-collapsed");
       localStorage.setItem("postsSidebarCollapsed", "true");
-      // 强制让右侧重新渲染一次，这样它才能检测到目录已收起，从而渲染出“显示该分类全部”按钮
       setTimeout(() => applyStateFromURL(), 10);
     }
   };
@@ -251,14 +271,19 @@ function renderMainContent(data) {
       `;
     }
   } else {
-    // 系列模式
     let html = "";
     if (ACTIVE_CAT_KEY === "all") {
       data.forEach(cat => {
+        let tagsHtml = "";
+        if (cat.tags && cat.tags.length > 0) {
+          tagsHtml = `<div class="category-tags">${cat.tags.map(t => `<a href="javascript:void(0)" data-tag="${encodeURIComponent(t)}" class="tag is-info is-light is-clickable" style="cursor:pointer;">${t}</a>`).join("")}</div>`;
+        }
+
         html += `
           <div class="category-wrapper" style="margin-bottom: 2.5rem;">
             <div class="category-header">
               <h2 class="category-title">${cat.name}</h2>
+              ${tagsHtml}
             </div>
             <div class="category-body">
         `;
@@ -276,7 +301,6 @@ function renderMainContent(data) {
       const currentGroup = data.find(g => g.key === ACTIVE_CAT_KEY);
       if (!currentGroup) return;
 
-      // 核心修改：判断是否选中了单一子系列，以及目录是否收起
       const isSpecificSeries = ACTIVE_SERIES_KEY !== "all";
       const isCollapsed = document.getElementById("posts-workspace").classList.contains("is-collapsed");
       
@@ -288,12 +312,26 @@ function renderMainContent(data) {
         </a>
       ` : "";
 
+      let displayTags = [];
+      if (isSpecificSeries) {
+        const currentSub = currentGroup.children.find(c => c.name === ACTIVE_SERIES_KEY);
+        if (currentSub && currentSub.tags) displayTags = currentSub.tags;
+      } else {
+        displayTags = currentGroup.tags || [];
+      }
+
+      let tagsHtml = "";
+      if (displayTags.length > 0) {
+        tagsHtml = `<div class="category-tags">${displayTags.map(t => `<a href="javascript:void(0)" data-tag="${encodeURIComponent(t)}" class="tag is-info is-light is-clickable" style="cursor:pointer;">${t}</a>`).join("")}</div>`;
+      }
+
       html += `
         <div class="category-wrapper">
-          <div class="category-header" style="display: flex; flex-direction: column; align-items: flex-start;">
+          <div class="category-header">
             <h2 class="category-title">${catTitle}</h2>
-            ${showAllBtnHtml}
+            ${tagsHtml}
           </div>
+          ${showAllBtnHtml ? `<div style="padding: 0 1.5rem 1rem;">${showAllBtnHtml}</div>` : ""}
           <div class="category-body">
       `;
       
@@ -313,6 +351,23 @@ function renderMainContent(data) {
     }
     main.innerHTML = html;
   }
+
+  // ==========================================
+  // 核心修复：动态绑定标签点击，确保能呼出浮窗
+  // ==========================================
+  const tagElements = main.querySelectorAll(".category-tags [data-tag]");
+  tagElements.forEach(tagEl => {
+    tagEl.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation(); // 阻止冒泡
+      const encodedTag = tagEl.getAttribute("data-tag");
+      if (window.openTagDrawer) {
+        window.openTagDrawer(encodedTag);
+      } else {
+        console.error("找不到 openTagDrawer 函数");
+      }
+    });
+  });
 }
 
 function renderCard(post) {
@@ -379,6 +434,73 @@ function applyStateFromURL() {
   renderMainContent(data);
 }
 
+/* ================= 标签文章列表浮窗 ================= */
+window.openTagDrawer = async function(encodedTag) {
+  const tag = decodeURIComponent(encodedTag);
+  
+  // 如果已存在则先关闭
+  if (document.getElementById("tag-drawer")) {
+    window.closeTagDrawer();
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  try {
+    const posts = await loadPostIndex();
+    const allFiltered = posts.filter(p => (p.tags || []).includes(tag))
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    let listHtml = "";
+    
+    if (allFiltered.length === 0) {
+      listHtml = `<div class="has-text-grey p-4 is-size-7">没有找到相关文章。</div>`;
+    } else {
+      listHtml = allFiltered.map(p => `
+        <a href="post?slug=${encodeURIComponent(p.slug)}" class="drawer-item">
+          <div class="drawer-item-title">${p.title}</div>
+          <div class="drawer-item-date">${p.date}</div>
+        </a>
+      `).join("");
+    }
+
+    const drawerHtml = `
+      <div id="tag-drawer" class="tag-drawer-panel">
+        <div class="drawer-header">
+          <span class="is-size-6 has-text-weight-bold"><i class="fas fa-tags mr-2"></i>标签：${tag}</span>
+          <button class="delete" onclick="window.closeTagDrawer()"></button>
+        </div>
+        <div class="drawer-body">
+          ${listHtml}
+        </div>
+      </div>
+      <div id="tag-drawer-backdrop" onclick="window.closeTagDrawer()"></div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", drawerHtml);
+
+    setTimeout(() => {
+      const panel = document.getElementById("tag-drawer");
+      const backdrop = document.getElementById("tag-drawer-backdrop");
+      if (panel) panel.classList.add("is-open");
+      if (backdrop) backdrop.classList.add("is-open");
+    }, 20);
+
+  } catch (e) {
+    console.error("加载标签文章失败", e);
+  }
+};
+
+window.closeTagDrawer = function() {
+  const panel = document.getElementById("tag-drawer");
+  const backdrop = document.getElementById("tag-drawer-backdrop");
+  
+  if (panel) panel.classList.remove("is-open");
+  if (backdrop) backdrop.classList.remove("is-open");
+
+  setTimeout(() => {
+    if (panel) panel.remove();
+    if (backdrop) backdrop.remove();
+  }, 300);
+};
+
 /* ================= 初始化 ================= */
 async function initPosts() {
   await initLayout("posts.html");
@@ -414,14 +536,12 @@ async function initPosts() {
   btnToggle.addEventListener("click", () => {
     workspace.classList.add("is-collapsed");
     localStorage.setItem("postsSidebarCollapsed", "true");
-    // 收起目录时，重新渲染内容以显示“显示全部”按钮
     applyStateFromURL();
   });
 
   btnExpand.addEventListener("click", () => {
     workspace.classList.remove("is-collapsed");
     localStorage.setItem("postsSidebarCollapsed", "false");
-    // 展开目录时，重新渲染内容以隐藏“显示全部”按钮
     applyStateFromURL();
   });
 
