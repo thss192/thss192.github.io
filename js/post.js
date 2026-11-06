@@ -439,6 +439,74 @@ function renderContent(title, date, tags, rawBody, meta) {
   initLightbox();
   initReadingProgress();
   renderPostExtras(title, date);
+
+  const currentSlug = getSlug();
+  if (currentSlug) {
+    initGiscus(currentSlug);
+  }
+}
+
+// ================= 动态加载 Giscus 评论区 =================
+function initGiscus(slug) {
+  const mount = document.getElementById("giscus-comments");
+  if (!mount) return;
+
+  // 防止重复加载
+  if (mount.dataset.loaded === "true") return;
+  mount.dataset.loaded = "true";
+
+  const giscusScript = document.createElement("script");
+  giscusScript.src = "https://giscus.app/client.js";
+  giscusScript.setAttribute("data-repo", "thss192/thss192.github.io");
+  giscusScript.setAttribute("data-repo-id", "R_kgDOVW1aCw");
+  
+  // 使用你之前建好的 Comments 分类
+  giscusScript.setAttribute("data-category", "Comments");
+  giscusScript.setAttribute("data-category-id", "DIC_kwDOVW1aC84DKdgr");
+  
+  // 核心：用 specific 映射，term 为当前文章的 slug
+  giscusScript.setAttribute("data-mapping", "specific");
+  giscusScript.setAttribute("data-term", slug);
+  
+  giscusScript.setAttribute("data-strict", "0");
+  giscusScript.setAttribute("data-reactions-enabled", "1"); // 开启点赞
+  giscusScript.setAttribute("data-emit-metadata", "0");
+  giscusScript.setAttribute("data-input-position", "bottom");
+  
+  // 初始主题我们使用透传，后面用 JS 强推
+  giscusScript.setAttribute("data-theme", "transparent_dark");
+  giscusScript.setAttribute("data-lang", "zh-CN");
+  giscusScript.setAttribute("crossorigin", "anonymous");
+  giscusScript.async = true;
+  
+  mount.appendChild(giscusScript);
+
+  // 延迟强推一次主题，防止首屏颜色不一致
+  setTimeout(() => syncGiscusTheme(), 1000);
+
+  // 监听主题切换
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === "data-theme") {
+        syncGiscusTheme();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+}
+
+// 同步主题给 Giscus iframe
+function syncGiscusTheme() {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  const theme = isDark ? "transparent_dark" : "light";
+  
+  const iframe = document.querySelector('iframe.giscus-frame');
+  if (iframe) {
+    iframe.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme } } },
+      'https://giscus.app'
+    );
+  }
 }
 
 initPost();
