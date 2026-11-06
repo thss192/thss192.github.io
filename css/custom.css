@@ -17,8 +17,7 @@
   --bg-dark-card-hover: #222;
   --text-dark-muted: #888;
   --border-dark: #2a2a2a;
-  
-  /* 优化次要文字对比度 */
+
   --bulma-text-light: #555555;
 }
 
@@ -101,35 +100,15 @@ body.sky-tinted.sky-night {
 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-/* 4. 页面通用卡片样式 (首页、系列分类、文章页) */
-.category-wrapper {
-  background: radial-gradient(circle at 100% 0%, var(--bulma-primary-soft) 0%, transparent 45%), linear-gradient(135deg, var(--bulma-scheme-main), var(--bulma-scheme-main-bis));
-  border: 1.5px solid var(--bulma-border);
-  border-radius: var(--bulma-radius-large);
-  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
-  margin-bottom: 2.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  transition: box-shadow 0.22s ease;
-}
-.category-wrapper:hover { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08); }
-[data-theme="dark"] .category-wrapper {
-  background: radial-gradient(circle at 100% 0%, rgba(0, 200, 150, 0.08) 0%, transparent 45%), linear-gradient(135deg, var(--bg-dark-card-hover), var(--bg-dark-card));
-  border-color: #3a3a3a;
+/* ==========================================================================
+   4. 文章卡片（首页 / 列表页 / 详情页共用）
+   ========================================================================== */
+.posts-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 
-.category-header {
-  padding-bottom: 1rem; margin-bottom: 1.5rem; border-bottom: 2px dashed var(--bulma-border-weak);
-  display: flex; align-items: center; justify-content: space-between;
-}
-[data-theme="dark"] .category-header { border-bottom-color: var(--border-dark); }
-.category-title { font-size: 1.6rem; font-weight: 800; color: var(--bulma-text-strong); display: flex; align-items: center; gap: 0.5rem;}
-
-.posts-group-count {
-  font-size: 0.75rem; font-weight: 500; color: var(--bulma-text-light); background: var(--bulma-scheme-main-ter); padding: 0.1rem 0.55rem; border-radius: var(--bulma-radius-rounded); border: 1px solid var(--bulma-border-weak);
-}
-
-/* 文章卡片通用样式 */
-.posts-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 .timeline-card {
   position: relative;
   display: flex; flex-direction: column; gap: 0.5rem;
@@ -155,13 +134,28 @@ body.sky-tinted.sky-night {
           mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon fill='black' points='50,8 60,38 92,38 66,57 76,90 50,70 24,90 34,57 8,38 40,38'/></svg>");
 }
 .timeline-card:nth-child(2n):hover::before { transform: rotate(72deg) scale(1.12); }
-.timeline-card-title { font-size: 1.02rem; font-weight: 700; color: var(--bulma-text-strong); line-height: 1.4; padding-right: 2.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; position: relative; }
-.timeline-card:hover .timeline-card-title { color: var(--bulma-primary); text-decoration: underline; text-decoration-color: var(--bulma-primary); text-decoration-thickness: 2px; text-underline-offset: 3px; }
-.timeline-card-summary { font-size: 0.82rem; line-height: 1.5; color: var(--bulma-text-light); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.timeline-card-meta { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: auto; padding-top: 0.5rem; }
-.timeline-card-date { font-family: var(--bulma-family-code); font-size: 0.7rem; font-weight: 600; color: var(--bulma-primary); background: var(--bulma-primary-soft); padding: 0.15rem 0.5rem; border-radius: var(--bulma-radius-rounded); white-space: nowrap; }
+
+.timeline-card-title {
+  font-size: 1.02rem; font-weight: 700; color: var(--bulma-text-strong); line-height: 1.4; padding-right: 2.5rem;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; position: relative;
+}
+.timeline-card:hover .timeline-card-title {
+  color: var(--bulma-primary); text-decoration: underline; text-decoration-color: var(--bulma-primary); text-decoration-thickness: 2px; text-underline-offset: 3px;
+}
+.timeline-card-summary {
+  font-size: 0.82rem; line-height: 1.5; color: var(--bulma-text-light);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.timeline-card-meta {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: auto; padding-top: 0.5rem;
+}
+.timeline-card-date {
+  font-family: var(--bulma-family-code); font-size: 0.7rem; font-weight: 600; color: var(--bulma-primary); background: var(--bulma-primary-soft); padding: 0.15rem 0.5rem; border-radius: var(--bulma-radius-rounded); white-space: nowrap;
+}
 .timeline-card-tags { display: flex; gap: 0.25rem; flex-wrap: wrap; justify-content: flex-end; }
-.timeline-card-tags .tag { font-size: 0.66rem !important; height: 1.6em !important; padding: 0 0.55em !important; font-weight: 600; background-color: transparent !important; color: var(--bulma-primary) !important; border: 1.5px solid var(--bulma-primary) !important; border-radius: var(--bulma-radius-rounded) !important; }
+.timeline-card-tags .tag {
+  font-size: 0.66rem !important; height: 1.6em !important; padding: 0 0.55em !important; font-weight: 600; background-color: transparent !important; color: var(--bulma-primary) !important; border: 1.5px solid var(--bulma-primary) !important; border-radius: var(--bulma-radius-rounded) !important;
+}
 .timeline-card:hover .timeline-card-tags .tag { background-color: var(--bulma-primary) !important; color: var(--bulma-primary-invert) !important; }
 
 [data-theme="dark"] .timeline-card { border-color: #3a3a3a; background: radial-gradient(circle at 100% 0%, rgba(0, 200, 150, 0.08) 0%, transparent 45%), linear-gradient(135deg, var(--bg-dark-card-hover), var(--bg-dark-card)); }
@@ -172,7 +166,99 @@ body.sky-tinted.sky-night {
 [data-theme="dark"] .timeline-card-tags .tag { border-color: var(--bulma-primary) !important; color: var(--bulma-primary) !important; }
 [data-theme="dark"] .timeline-card:hover .timeline-card-tags .tag { background-color: var(--bulma-primary) !important; color: var(--bg-dark) !important; }
 
-/* 5. 独立页面通用 */
+/* ==========================================================================
+   5. 分类大卡片（列表页使用）
+   ========================================================================== */
+.category-wrapper {
+  position: relative;
+  background: radial-gradient(circle at 100% 0%, var(--bulma-primary-soft) 0%, transparent 45%), linear-gradient(135deg, var(--bulma-scheme-main), var(--bulma-scheme-main-bis));
+  border: 1.5px solid var(--bulma-border);
+  border-radius: var(--bulma-radius-large);
+  padding: 1.5rem 1.5rem 0 1.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.category-wrapper:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--bulma-primary-soft);
+}
+.category-wrapper::before {
+  content: ""; position: absolute; top: -20px; right: -20px; width: 100px; height: 100px;
+  pointer-events: none; color: var(--bulma-primary); opacity: 0.08; background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><ellipse cx='50' cy='22' rx='13' ry='20'/><ellipse cx='50' cy='78' rx='13' ry='20'/><ellipse cx='22' cy='50' rx='20' ry='13'/><ellipse cx='78' cy='50' rx='20' ry='13'/><ellipse cx='30' cy='30' rx='13' ry='18' transform='rotate(45 30 30)'/><ellipse cx='70' cy='30' rx='13' ry='18' transform='rotate(-45 70 30)'/><ellipse cx='30' cy='70' rx='13' ry='18' transform='rotate(-45 30 70)'/><ellipse cx='70' cy='70' rx='13' ry='18' transform='rotate(45 70 70)'/><circle cx='50' cy='50' r='9' fill='white'/></g></svg>");
+          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><ellipse cx='50' cy='22' rx='13' ry='20'/><ellipse cx='50' cy='78' rx='13' ry='20'/><ellipse cx='22' cy='50' rx='20' ry='13'/><ellipse cx='78' cy='50' rx='20' ry='13'/><ellipse cx='30' cy='30' rx='13' ry='18' transform='rotate(45 30 30)'/><ellipse cx='70' cy='30' rx='13' ry='18' transform='rotate(-45 70 30)'/><ellipse cx='30' cy='70' rx='13' ry='18' transform='rotate(-45 30 70)'/><ellipse cx='70' cy='70' rx='13' ry='18' transform='rotate(45 70 70)'/><circle cx='50' cy='50' r='9' fill='white'/></g></svg>");
+  -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+[data-theme="dark"] .category-wrapper {
+  background: radial-gradient(circle at 100% 0%, rgba(0, 200, 150, 0.08) 0%, transparent 45%), linear-gradient(135deg, var(--bg-dark-card-hover), var(--bg-dark-card));
+  border-color: #3a3a3a;
+}
+[data-theme="dark"] .category-wrapper:hover { border-color: var(--bulma-primary); }
+
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px dashed var(--bulma-border-weak);
+}
+[data-theme="dark"] .category-header { border-bottom-color: var(--border-dark); }
+
+.category-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--bulma-text-strong);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.category-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  justify-content: flex-start;
+  max-width: 100%;
+  margin-top: 0.15rem;
+}
+.category-tags .tag {
+  font-size: 0.72rem !important;
+  height: 1.7em !important;
+  padding: 0 0.65em !important;
+  font-weight: 600;
+  background-color: var(--bulma-info-soft, rgba(62, 142, 208, 0.15)) !important;
+  color: var(--bulma-info-dark, #1a5c9e) !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--bulma-radius-rounded) !important;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.category-tags .tag:hover {
+  background-color: var(--bulma-info) !important;
+  color: var(--bulma-info-invert, #fff) !important;
+  transform: translateY(-1px);
+}
+[data-theme="dark"] .category-tags .tag {
+  background-color: rgba(62, 142, 208, 0.18) !important;
+  color: #8ec5f0 !important;
+  border-color: transparent !important;
+}
+[data-theme="dark"] .category-tags .tag:hover {
+  background-color: var(--bulma-info) !important;
+  color: #fff !important;
+}
+
+/* ==========================================================================
+   6. 独立页面通用
+   ========================================================================== */
 .about-card { background: linear-gradient(135deg, var(--bulma-scheme-main), var(--bulma-scheme-main-bis)); border: 1px solid var(--bulma-border-weak); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
 .about-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); }
 [data-theme="dark"] .about-card { background: linear-gradient(135deg, var(--bg-dark-card), var(--bg-dark-card-hover)); border-color: #333; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); }
@@ -186,7 +272,9 @@ body.sky-tinted.sky-night {
 [data-theme="dark"] .about-card .button.is-primary.is-light:hover { background-color: var(--bulma-primary) !important; color: var(--bg-dark) !important; border-color: var(--bulma-primary); }
 [data-theme="dark"] .links-page .button.is-light { background-color: var(--border-dark) !important; color: #ddd !important; border: 1px solid #444; }
 
-/* 6. 动态天空模块 */
+/* ==========================================================================
+   7. 动态天空模块
+   ========================================================================== */
 .hero-sky { position: relative; overflow: hidden; min-height: 180px; background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%) !important; transition: background 1s ease; }
 .hero-sky #sky-stars { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1s ease; background-image: radial-gradient(1px 1px at 10% 20%, #fff 1px, transparent 0), radial-gradient(1.5px 1.5px at 30% 50%, #fff 1px, transparent 0), radial-gradient(1px 1px at 60% 10%, #fff 1px, transparent 0), radial-gradient(2px 2px at 80% 70%, #fff 1px, transparent 0), radial-gradient(1px 1px at 40% 80%, #fff 1px, transparent 0), radial-gradient(1.5px 1.5px at 90% 40%, #fff 1px, transparent 0); background-size: 200px 200px; animation: starTwinkle 4s infinite alternate; }
 @keyframes starTwinkle { 0% { opacity: 0.8; } 100% { opacity: 1; } }
@@ -218,13 +306,15 @@ body.sky-tinted.sky-night {
 #sky-moon.moon-visible { opacity: 1 !important; transform: translateY(0) scale(1) !important; transition-delay: 0.3s !important; }
 .no-anim-sky #sky-celestial, .no-anim-sky #sky-moon { transition: none !important; }
 
-/* 横幅文字自适应天空明暗 */
 .hero-sky .title, .hero-sky #page-title, .hero-sky #hero-title, .hero-sky #about-page-title, .hero-sky .subtitle, .hero-sky #page-subtitle, .hero-sky #hero-subtitle { transition: color 0.5s ease, text-shadow 0.5s ease !important; }
 .hero-sky:not(.is-dark-sky) .title, .hero-sky:not(.is-dark-sky) #page-title, .hero-sky:not(.is-dark-sky) #hero-title, .hero-sky:not(.is-dark-sky) #about-page-title { color: var(--bulma-text-strong) !important; text-shadow: 0 2px 10px rgba(255, 255, 255, 0.4) !important; }
 .hero-sky:not(.is-dark-sky) .subtitle, .hero-sky:not(.is-dark-sky) #page-subtitle, .hero-sky:not(.is-dark-sky) #hero-subtitle { color: var(--bulma-text) !important; text-shadow: 0 1px 5px rgba(255, 255, 255, 0.3) !important; }
 .hero-sky.is-dark-sky .title, .hero-sky.is-dark-sky #page-title, .hero-sky.is-dark-sky #hero-title, .hero-sky.is-dark-sky #about-page-title { color: #ffffff !important; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5) !important; }
 .hero-sky.is-dark-sky .subtitle, .hero-sky.is-dark-sky #page-subtitle, .hero-sky.is-dark-sky #hero-subtitle { color: rgba(255, 255, 255, 0.85) !important; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4) !important; }
 
+/* ==========================================================================
+   8. 响应式
+   ========================================================================== */
 @media screen and (max-width: 1023px) {
   .navbar-menu.is-active { background-color: var(--bulma-scheme-main) !important; border-bottom: 1px solid var(--bulma-border-weak); z-index: 1000; }
   [data-theme="dark"] .navbar-menu.is-active { background-color: var(--bg-dark-card) !important; border-bottom-color: var(--border-dark); }
