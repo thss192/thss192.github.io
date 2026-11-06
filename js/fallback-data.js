@@ -111,7 +111,7 @@ window.__POSTS_FALLBACK__ = [
       "python",
       "服务器"
     ],
-    "category": "项目笔记",
+    "category": "技术笔记",
     "series": "Python",
     "summary": "关于本地编写python到服务器运行。"
   },
@@ -123,7 +123,7 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "git"
     ],
-    "category": "项目笔记",
+    "category": "技术笔记",
     "series": "项目规范",
     "summary": "git学习笔记。"
   },
@@ -147,7 +147,7 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "git"
     ],
-    "category": "项目笔记",
+    "category": "技术笔记",
     "series": "项目规范",
     "summary": "在上次项目下继续练习常用 Git 指令。"
   },
@@ -159,7 +159,7 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "服务器"
     ],
-    "category": "项目笔记",
+    "category": "技术笔记",
     "series": "Linux",
     "summary": "关于如何配置新买的云服务器。"
   },
@@ -172,7 +172,7 @@ window.__POSTS_FALLBACK__ = [
       "服务器",
       "docker"
     ],
-    "category": "项目笔记",
+    "category": "技术笔记",
     "series": "Decker",
     "summary": "学习decker第一步。"
   },
@@ -184,7 +184,7 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "git"
     ],
-    "category": "项目笔记",
+    "category": "技术笔记",
     "series": "项目规范",
     "summary": "关于编写过程中怎么组织代码。"
   },
@@ -196,11 +196,10 @@ window.__POSTS_FALLBACK__ = [
     "tags": [
       "C++",
       "优化",
-      "性能",
-      "底层"
+      "性能"
     ],
     "category": "技术笔记",
-    "series": "C++ 底层探索",
+    "series": "C++",
     "summary": "从内存对齐、位域、移动语义到编译期优化，全面总结 C++ 程序体积与运行效率的瘦身指南。"
   }
 ];
