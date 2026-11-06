@@ -1,4 +1,4 @@
-﻿// 极致性能版 Particle Effects (纯白发光矢量星星)
+﻿// 极致极简版 Particle Effects (纯白实心无描边五角星)
 (function () {
   const canvas = document.createElement("canvas");
   canvas.id = "effects-canvas";
@@ -65,13 +65,12 @@
     ctx.stroke();
   }
 
-  // 纯白高光矢量星星（无 blur，极低消耗）
-  function drawWhiteStar(ctx, size, alpha) {
+  // 纯白实心无描边五角星（极简几何路径）
+  function drawPureWhiteStar(ctx, size, alpha) {
     const R = size;          
     const r = size * 0.45;   
     const points = 5;
     
-    // 画外圈柔光（用半透明填充模拟，代替极耗性能的 blur）
     ctx.beginPath();
     for (let i = 0; i < points * 2; i++) {
       const radius = i % 2 === 0 ? R : r;
@@ -83,30 +82,9 @@
     }
     ctx.closePath();
 
-    // 1. 填充半透明白底
-    ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.3})`;
-    ctx.fill();
-
-    // 2. 实心纯白星星
-    ctx.beginPath();
-    const r2 = r * 0.85; // 内缩一点
-    for (let i = 0; i < points * 2; i++) {
-      const radius = i % 2 === 0 ? R * 0.85 : r2;
-      const angle = (i * Math.PI) / points - Math.PI / 2;
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.closePath();
+    // 纯白填充，没有柔光，没有描边
     ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
     ctx.fill();
-
-    // 3. 极细的高光描边增加锐利度
-    ctx.lineWidth = Math.max(1, size * 0.05);
-    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.9})`;
-    ctx.lineJoin = "round";
-    ctx.stroke();
   }
 
   class Particle {
@@ -118,7 +96,6 @@
       
       this.size = isClick ? Math.random() * 8 + 6 : Math.random() * 6 + 4;
       
-      // 白色星星尺寸调大一点更有质感
       if (type === "meteor") this.size = Math.random() * 6 + 10; 
       if (type === "snow") this.size = Math.random() * 5 + 4;
 
@@ -177,7 +154,7 @@
       ctx.rotate(this.rotation);
 
       if (this.type === "star") {
-        // 十字星：跟随主题色
+        // 十字星（带主题色）
         ctx.shadowBlur = 10;
         ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${alpha * 0.8})`;
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
@@ -219,8 +196,8 @@
         // 雪花
         drawSnowflake(ctx, this.size, alpha);
       } else if (this.type === "meteor") {
-        // 纯白发光星星（极速矢量绘制）
-        drawWhiteStar(ctx, this.size, alpha);
+        // 纯白无描边实心五角星
+        drawPureWhiteStar(ctx, this.size, alpha);
       }
       ctx.restore();
     }
@@ -277,7 +254,7 @@
 
   window.__setEffectOpacity = (val) => {
     currentOpacity = parseFloat(val);
-    localStorage.setItem("effect_opacity", val);
+    localStorage.setItem("effect_opacity", currentOpacity);
   };
 
   setTimeout(() => {
