@@ -101,7 +101,46 @@ body.sky-tinted.sky-night {
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 /* ==========================================================================
-   4. 文章卡片（首页 / 列表页 / 详情页共用）
+   4. 标签文章侧边浮窗（全局通用）
+   ========================================================================== */
+.tag-drawer-panel {
+  position: fixed; top: 0; right: -320px; width: 300px; height: 100vh;
+  background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1); z-index: 10000; display: flex; flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+[data-theme="dark"] .tag-drawer-panel { background: rgba(18, 18, 18, 0.85); box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5); }
+.tag-drawer-panel.is-open { right: 0; }
+
+.drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--bulma-border-weak); }
+[data-theme="dark"] .drawer-header { border-bottom-color: var(--border-dark); }
+
+.drawer-body { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.drawer-item {
+  display: block; padding: 1rem; background: var(--bulma-scheme-main);
+  border: 1px solid var(--bulma-border-weak); border-radius: var(--bulma-radius-large);
+  text-decoration: none; color: inherit; transition: all 0.2s ease;
+}
+.drawer-item:hover { background: var(--bulma-primary-soft); border-color: var(--bulma-primary); transform: translateX(-4px); }
+[data-theme="dark"] .drawer-item { background: var(--bg-dark-card); border-color: var(--border-dark); }
+[data-theme="dark"] .drawer-item:hover { background: rgba(0, 200, 150, 0.1); border-color: var(--bulma-primary); }
+
+.drawer-item-title { font-weight: 700; font-size: 0.95rem; color: var(--bulma-text-strong); margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.drawer-item-date { font-size: 0.75rem; color: var(--bulma-text-light); font-family: var(--bulma-family-code); }
+
+.drawer-item.is-current { background: var(--bulma-primary-soft) !important; border-color: var(--bulma-primary) !important; border-left: 4px solid var(--bulma-primary) !important; cursor: default; }
+.drawer-item.is-current .drawer-item-title { color: var(--bulma-primary) !important; }
+[data-theme="dark"] .drawer-item.is-current { background: rgba(0, 200, 150, 0.1) !important; border-color: var(--bulma-primary) !important; }
+
+#tag-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px);
+  z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+#tag-drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+/* ==========================================================================
+   5. 文章卡片（首页 / 列表页 / 详情页共用）
    ========================================================================== */
 .posts-cards {
   display: grid;
@@ -182,7 +221,7 @@ body.sky-tinted.sky-night {
 [data-theme="dark"] .timeline-card:hover .timeline-card-tags .tag { background-color: var(--bulma-primary) !important; color: var(--bg-dark) !important; }
 
 /* ==========================================================================
-   5. 分类大卡片（列表页使用）
+   6. 分类大卡片（列表页使用）
    ========================================================================== */
 .category-wrapper {
   position: relative;
@@ -289,7 +328,7 @@ body.sky-tinted.sky-night {
 }
 
 /* ==========================================================================
-   6. 独立页面通用（关于页名片加花纹）
+   7. 独立页面通用（关于页名片）
    ========================================================================== */
 .about-card {
   position: relative;
@@ -301,7 +340,6 @@ body.sky-tinted.sky-night {
 }
 .about-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); }
 
-/* 右上角：星星花纹 */
 .about-card::before {
   content: ""; position: absolute; top: -25px; right: -25px; width: 140px; height: 140px;
   pointer-events: none; color: var(--bulma-primary); opacity: 0.07; background-color: currentColor;
@@ -329,7 +367,7 @@ body.sky-tinted.sky-night {
 [data-theme="dark"] .links-page .button.is-light { background-color: var(--border-dark) !important; color: #ddd !important; border: 1px solid #444; }
 
 /* ==========================================================================
-   7. 动态天空模块
+   8. 动态天空模块
    ========================================================================== */
 .hero-sky { position: relative; overflow: hidden; min-height: 180px; background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%) !important; transition: background 1s ease; }
 .hero-sky #sky-stars { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1s ease; background-image: radial-gradient(1px 1px at 10% 20%, #fff 1px, transparent 0), radial-gradient(1.5px 1.5px at 30% 50%, #fff 1px, transparent 0), radial-gradient(1px 1px at 60% 10%, #fff 1px, transparent 0), radial-gradient(2px 2px at 80% 70%, #fff 1px, transparent 0), radial-gradient(1px 1px at 40% 80%, #fff 1px, transparent 0), radial-gradient(1.5px 1.5px at 90% 40%, #fff 1px, transparent 0); background-size: 200px 200px; animation: starTwinkle 4s infinite alternate; }
@@ -369,7 +407,7 @@ body.sky-tinted.sky-night {
 .hero-sky.is-dark-sky .subtitle, .hero-sky.is-dark-sky #page-subtitle, .hero-sky.is-dark-sky #hero-subtitle { color: rgba(255, 255, 255, 0.85) !important; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4) !important; }
 
 /* ==========================================================================
-   8. 响应式
+   9. 响应式
    ========================================================================== */
 @media screen and (max-width: 1023px) {
   .navbar-menu.is-active { background-color: var(--bulma-scheme-main) !important; border-bottom: 1px solid var(--bulma-border-weak); z-index: 1000; }
