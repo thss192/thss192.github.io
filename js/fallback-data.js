@@ -187,6 +187,21 @@ window.__POSTS_FALLBACK__ = [
     "category": "项目笔记",
     "series": "项目规范",
     "summary": "关于编写过程中怎么组织代码。"
+  },
+  {
+    "slug": "cpp-memory-optimization",
+    "title": "程序体积优化规范 (C++)",
+    "date": "2026-11-07",
+    "order": 1,
+    "tags": [
+      "C++",
+      "优化",
+      "性能",
+      "底层"
+    ],
+    "category": "技术笔记",
+    "series": "C++ 底层探索",
+    "summary": "从内存对齐、位域、移动语义到编译期优化，全面总结 C++ 程序体积与运行效率的瘦身指南。"
   }
 ];
 
