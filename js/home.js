@@ -41,7 +41,6 @@ function getDynamicGreeting() {
 function renderCard(post) {
   const tags = (post.tags || []).map(t => `<span class="tag is-info is-light">${t}</span>`).join("");
 
-  // 分类/系列徽章（绝对定位到卡片右上角）
   let seriesHtml = "";
   if (post.category && post.series) {
     seriesHtml = `<span class="timeline-card-series">
@@ -108,10 +107,12 @@ function initInteractiveTagCloud(posts) {
   });
 }
 
-// ================= 右侧：个人信息 + 开源项目 =================
+// ================= 右侧：个人信息 + 开源项目 + 探索博客/看板 =================
 async function renderSidebar(config) {
   const profileTopEl = document.getElementById("sidebar-profile-top");
   const projectsEl = document.getElementById("sidebar-projects");
+  const statsEl = document.getElementById("sidebar-stats");
+  
   if (!profileTopEl || !projectsEl) return;
 
   const a = (config && config.author) || {};
@@ -164,6 +165,43 @@ async function renderSidebar(config) {
         <a href="projects" class="is-size-7 has-text-link">查看全部 →</a>
       </div>
     </div>`;
+
+  // ================= 新增：数据看板（渲染在“探索博客”卡片内部下方） =================
+  if (statsEl && window.__POSTS_FALLBACK__) {
+    const posts = window.__POSTS_FALLBACK__;
+    const totalPosts = posts.length;
+    const totalTags = new Set(posts.flatMap(p => p.tags || [])).size;
+    const totalSeries = new Set(posts.map(p => p.series).filter(Boolean)).size;
+    
+    // 计算运行天数 (使用 config 中的 startDate)
+    let runningDays = 0;
+    if (a.startDate) {
+      const start = new Date(a.startDate);
+      const today = new Date();
+      runningDays = Math.max(1, Math.ceil((today - start) / (1000 * 60 * 60 * 24)));
+    }
+
+    statsEl.innerHTML = `
+      <div class="stats-grid mt-4 pt-3" style="border-top: 1px dashed var(--bulma-border-weak);">
+        <div class="stat-item" title="文章总数">
+          <span class="stat-value">${totalPosts}</span>
+          <span class="stat-label">文章总数</span>
+        </div>
+        <div class="stat-item" title="系列总数">
+          <span class="stat-value">${totalSeries}</span>
+          <span class="stat-label">系列总数</span>
+        </div>
+        <div class="stat-item" title="标签总数">
+          <span class="stat-value">${totalTags}</span>
+          <span class="stat-label">标签总数</span>
+        </div>
+        <div class="stat-item" title="博客运行天数">
+          <span class="stat-value">${runningDays}</span>
+          <span class="stat-label">运行天数</span>
+        </div>
+      </div>
+    `;
+  }
 }
 
 async function initHome() {
@@ -179,7 +217,7 @@ async function initHome() {
   }
   if (heroSubtitle) heroSubtitle.textContent = hero.subtitle || "";
 
-  // 右侧卡片（个人信息 + 项目），不阻塞左侧文章列表
+  // 右侧卡片
   renderSidebar(config);
 
   // 左侧文章与标签云

@@ -64,7 +64,6 @@
 [data-theme="dark"] .content-card::before { opacity: 0.08; }
 [data-theme="dark"] .content-card:hover::before { opacity: 0.13; }
 
-/* 保证内容在花纹之上 */
 .content-card > * {
   position: relative;
   z-index: 1;
@@ -188,19 +187,17 @@
   color: var(--bulma-primary);
 }
 
-/* ================= 开源项目列表（增加透明度） ================= */
+/* 开源项目列表 */
 .profile-projects ul { margin-top: 0.5rem; }
 .profile-projects li {
   padding: 0.5rem 0.6rem;
   margin-bottom: 0.5rem;
   border-radius: var(--bulma-radius);
   border-bottom: 1px dashed var(--bulma-border-weak);
-  /* 初始状态保持完全透明 */
   background: transparent;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 .profile-projects li:hover {
-  /* 高亮时也使用半透明主题色，跟随当前配色 */
   background: color-mix(in srgb, var(--bulma-primary) 10%, transparent);
   transform: translateX(3px);
 }
@@ -322,7 +319,7 @@
   color: var(--bulma-primary);
 }
 
-/* ================= 右侧导航（增加透明度 / 毛玻璃感） ================= */
+/* ================= 右侧导航（透明度 / 毛玻璃感） ================= */
 .home-nav-links {
   display: flex;
   flex-direction: column;
@@ -369,6 +366,46 @@
 .nav-text { flex: 1; display: flex; flex-direction: column; }
 .nav-title { font-weight: 700; font-size: 0.9rem; color: var(--bulma-text-strong); }
 .nav-desc { font-size: 0.75rem; color: var(--bulma-text-light); }
+
+/* ================= 数据看板 ================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background: var(--bulma-scheme-main-bis);
+  border-radius: var(--bulma-radius);
+  border: 1px solid var(--bulma-border-weak);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.stat-item:hover {
+  background: var(--bulma-primary-soft);
+  transform: translateY(-1px);
+}
+[data-theme="dark"] .stat-item {
+  background: var(--bg-dark-card-hover);
+  border-color: var(--border-dark);
+}
+[data-theme="dark"] .stat-item:hover {
+  background: rgba(0, 200, 150, 0.1);
+}
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--bulma-primary);
+  line-height: 1.1;
+}
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--bulma-text-light);
+  margin-top: 0.1rem;
+}
 
 /* ================= 响应式 ================= */
 @media screen and (max-width: 1024px) {

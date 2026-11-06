@@ -8,6 +8,7 @@
     "avatar": "images/avatar.png",
     "email": "i@xwx.life",
     "startYear": 2024,
+    "startDate": "2026-10-25", 
     "skills": [
       "c/c++",
       "python",

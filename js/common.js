@@ -201,12 +201,18 @@ function renderNavbar(config, page) {
       else if (cat) labelText = cat;
       else labelText = series;
 
+      // ================= 新增：将系列进度追加到按钮文字后面 =================
+      let progressText = "";
+      if (meta.seriesIndex && meta.seriesTotal) {
+        progressText = ` (${meta.seriesIndex}/${meta.seriesTotal})`;
+      }
+
       // 为了让按钮好看且不撑爆导航栏，我们通过 style 限制最大宽度
       postNavAction = `
-        <a href="${url}" class="button is-small is-rounded nav-return-btn" title="返回目录：${labelText}">
+        <a href="${url}" class="button is-small is-rounded nav-return-btn" title="返回目录：${labelText}${progressText}">
           <span class="icon is-small"><i class="fas fa-folder-open"></i></span>
-          <span class="nav-return-text" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-            ${labelText}
+          <span class="nav-return-text" style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            ${labelText}${progressText}
           </span>
         </a>
       `;
