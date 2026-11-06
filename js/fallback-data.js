@@ -117,7 +117,7 @@ window.__POSTS_FALLBACK__ = [
   },
   {
     "slug": "2026-10-27",
-    "title": "学习git进行项目管理",
+    "title": "git 入门",
     "date": "2026-10-27",
     "order": 9999,
     "tags": [
@@ -153,7 +153,7 @@ window.__POSTS_FALLBACK__ = [
   },
   {
     "slug": "2026-10-31",
-    "title": "对于新服务器的配置",
+    "title": "配置新服务器",
     "date": "2026-10-31",
     "order": 9999,
     "tags": [
@@ -178,7 +178,7 @@ window.__POSTS_FALLBACK__ = [
   },
   {
     "slug": "2026-11-03",
-    "title": "关于文件组织与推送",
+    "title": "约定式提交规范",
     "date": "2026-11-03",
     "order": 9999,
     "tags": [
@@ -186,7 +186,7 @@ window.__POSTS_FALLBACK__ = [
     ],
     "category": "技术笔记",
     "series": "项目规范",
-    "summary": "关于编写过程中怎么组织代码。"
+    "summary": "规范推送代码流程。"
   },
   {
     "slug": "cpp-memory-optimization",
