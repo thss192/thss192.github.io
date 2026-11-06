@@ -28,7 +28,7 @@ const el = document.getElementById("link-list");
 
   let links = [];
   try {
-    const res = await fetch("links.json");
+    const res = await fetch("data/links.json");
     if (!res.ok) throw new Error("HTTP " + res.status);
     links = await res.json();
   } catch (e) {

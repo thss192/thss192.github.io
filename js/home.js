@@ -161,7 +161,7 @@ async function initHome() {
   if (sidebarProjects) {
     let projects = [];
     try {
-      const res = await fetch("projects.json");
+      const res = await fetch("data/projects.json");
       if (res.ok) projects = await res.json();
     } catch (e) {
       projects = window.__PROJECTS_FALLBACK__ || [];

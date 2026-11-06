@@ -2,7 +2,7 @@
 
 async function loadConfig() {
   try {
-    const res = await fetch("config.json");
+    const res = await fetch("data/config.json");
     if (!res.ok) throw new Error("HTTP " + res.status);
     const cfg = await res.json();
     window.__CONFIG__ = cfg;

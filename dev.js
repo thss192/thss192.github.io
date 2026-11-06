@@ -163,7 +163,7 @@ fs.watch(ROOT, { recursive: true }, (eventType, filename) => {
     console.log(`📝 检测到变动: ${filename}`);
     
     // 如果改的是 md 文件或 config.json，先跑数据生成，然后再刷新
-    if (filename.endsWith(".md") || filename === "config.json" || filename === "projects.json" || filename === "links.json") {
+    if (filename.endsWith(".md") || filename.endsWith("config.json") || filename.endsWith("projects.json") || filename.endsWith("links.json")) {
       runGenerate();
     } else {
       // 如果改的是 html/css/js，直接刷新

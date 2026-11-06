@@ -21,7 +21,7 @@ async function initProjects() {
 
   let projects = [];
   try {
-    const res = await fetch("projects.json");
+    const res = await fetch("data/projects.json");
     if (!res.ok) throw new Error("HTTP " + res.status);
     projects = await res.json();
   } catch (e) {
