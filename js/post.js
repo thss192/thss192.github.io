@@ -329,55 +329,17 @@ async function initPost() {
   }
 }
 
-function renderBreadcrumb(meta) {
-  const crumbEl = document.getElementById("post-breadcrumb");
-  if (!crumbEl) return;
-
-  const cat = meta.category;
-  const series = meta.series;
-
-  if (!cat && !series) {
-    crumbEl.innerHTML = "";
-    return;
-  }
-
-  // 跳转到时间线
-  if (!cat) {
-    crumbEl.innerHTML = `
-      <a href="posts?view=series&category=${encodeURIComponent(series)}&series=all" class="button is-small is-rounded is-light">
-        <span class="icon is-small"><i class="fas fa-layer-group"></i></span>
-        <span>查看系列：${series}</span>
-      </a>
-    `;
-    return;
-  }
-
-  // 跳转到系列页
-  let url = `posts?view=series&category=${encodeURIComponent(cat)}`;
-  if (series) {
-    url += `&series=${encodeURIComponent(series)}`;
-  } else {
-    url += `&series=all`;
-  }
-
-  const seriesLabel = series ? `<span class="mx-2 has-text-grey-light">/</span> ${series}` : "";
-  
-  crumbEl.innerHTML = `
-    <a href="${url}" class="button is-small is-rounded is-light">
-      <span class="icon is-small"><i class="fas fa-folder-open"></i></span>
-      <span>返回目录：${cat}${seriesLabel}</span>
-    </a>
-  `;
-}
-
-function renderContent(title, date, tags, rawBody) {
+function renderContent(title, date, tags, rawBody, meta) {
   const headerEl = document.getElementById("post-header");
   const bodyEl = document.getElementById("post-body");
+  
+  // 删除了 renderBreadcrumb 的调用
 
   const readTime = calcReadTime(rawBody);
 
+  // 【修改】：把标签变成可以点击呼出浮窗的按钮
   const tagHtml = (tags || [])
-    .map(t => `<a href="index?tag=${encodeURIComponent(t)}" class="tag is-info is-light mr-1 is-clickable">${t}</a>`)
+    .map(t => `<a href="javascript:void(0)" onclick="openTagDrawer('${encodeURIComponent(t)}')" class="tag is-info is-light mr-1 is-clickable">${t}</a>`)
     .join("");
     
   headerEl.innerHTML = `
@@ -511,5 +473,94 @@ function syncGiscusTheme() {
     );
   }
 }
+
+// ================= 标签文章列表浮窗 =================
+window.openTagDrawer = async function(encodedTag) {
+  const tag = decodeURIComponent(encodedTag);
+  
+  if (document.getElementById("tag-drawer")) {
+    closeTagDrawer();
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  try {
+    const posts = await loadPostIndex();
+    const currentSlug = getSlug();
+    
+    // 找出所有包含该标签的文章，直接按时间倒序
+    const allFiltered = posts.filter(p => (p.tags || []).includes(tag))
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    let listHtml = "";
+    
+    if (allFiltered.length === 0) {
+      listHtml = `<div class="has-text-grey p-4 is-size-7">没有找到相关文章。</div>`;
+    } else {
+      // 直接遍历渲染
+      listHtml = allFiltered.map(p => {
+        const isCurrent = p.slug === currentSlug;
+        
+        // 如果是当前文章，不可点击，带有高亮样式和特殊提示
+        if (isCurrent) {
+          return `
+            <a href="javascript:void(0)" class="drawer-item is-current">
+              <div class="drawer-item-title">
+                <span class="icon is-small mr-1" style="color: var(--bulma-primary);"><i class="fas fa-book-open"></i></span>
+                ${p.title}
+              </div>
+              <div class="drawer-item-date">${p.date} (正在阅读)</div>
+            </a>
+          `;
+        }
+        
+        // 其他文章正常点击跳转
+        return `
+          <a href="post?slug=${encodeURIComponent(p.slug)}" class="drawer-item">
+            <div class="drawer-item-title">${p.title}</div>
+            <div class="drawer-item-date">${p.date}</div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    const drawerHtml = `
+      <div id="tag-drawer" class="tag-drawer-panel">
+        <div class="drawer-header">
+          <span class="is-size-6 has-text-weight-bold"><i class="fas fa-tags mr-2"></i>标签：${tag}</span>
+          <button class="delete" onclick="closeTagDrawer()"></button>
+        </div>
+        <div class="drawer-body">
+          ${listHtml}
+        </div>
+      </div>
+      <div id="tag-drawer-backdrop" onclick="closeTagDrawer()"></div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", drawerHtml);
+
+    setTimeout(() => {
+      const panel = document.getElementById("tag-drawer");
+      const backdrop = document.getElementById("tag-drawer-backdrop");
+      if (panel) panel.classList.add("is-open");
+      if (backdrop) backdrop.classList.add("is-open");
+    }, 20);
+
+  } catch (e) {
+    console.error("加载标签文章失败", e);
+  }
+};
+// ================= 关闭浮窗（带淡出动画） =================
+window.closeTagDrawer = function() {
+  const panel = document.getElementById("tag-drawer");
+  const backdrop = document.getElementById("tag-drawer-backdrop");
+  
+  if (panel) panel.classList.remove("is-open");
+  if (backdrop) backdrop.classList.remove("is-open");
+
+  // 等动画执行完毕后，彻底删除 DOM，释放点击事件
+  setTimeout(() => {
+    if (panel) panel.remove();
+    if (backdrop) backdrop.remove();
+  }, 300);
+};
 
 initPost();

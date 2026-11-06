@@ -307,24 +307,3 @@ body.sky-tinted.sky-night {
   .posts-cards, #post-list .posts-cards { grid-template-columns: 1fr; }
 }
 
-/* ===== 导航栏“返回目录”按钮专属样式 ===== */
-.nav-return-btn {
-  background-color: var(--bulma-primary-soft) !important;
-  color: var(--bulma-primary) !important;
-  border: 1px solid transparent !important;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-.nav-return-btn:hover {
-  background-color: var(--bulma-primary) !important;
-  color: var(--bulma-primary-invert) !important;
-  transform: translateX(-2px);
-}
-[data-theme="dark"] .nav-return-btn {
-  background-color: rgba(0, 200, 150, 0.15) !important;
-  color: var(--bulma-primary) !important;
-}
-[data-theme="dark"] .nav-return-btn:hover {
-  background-color: var(--bulma-primary) !important;
-  color: var(--bg-dark) !important;
-}
