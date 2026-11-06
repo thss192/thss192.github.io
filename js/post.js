@@ -337,7 +337,7 @@ function renderBreadcrumb(meta) {
   // 跳转到时间线
   if (!cat) {
     crumbEl.innerHTML = `
-      <a href="posts.html?view=series&category=${encodeURIComponent(series)}&series=all" class="button is-small is-rounded is-light">
+      <a href="posts?view=series&category=${encodeURIComponent(series)}&series=all" class="button is-small is-rounded is-light">
         <span class="icon is-small"><i class="fas fa-layer-group"></i></span>
         <span>查看系列：${series}</span>
       </a>
@@ -346,7 +346,7 @@ function renderBreadcrumb(meta) {
   }
 
   // 跳转到系列页
-  let url = `posts.html?view=series&category=${encodeURIComponent(cat)}`;
+  let url = `posts?view=series&category=${encodeURIComponent(cat)}`;
   if (series) {
     url += `&series=${encodeURIComponent(series)}`;
   } else {
@@ -374,7 +374,7 @@ function renderContent(title, date, tags, rawBody, meta) {
   const readTime = calcReadTime(rawBody);
 
   const tagHtml = (tags || [])
-    .map(t => `<a href="index.html?tag=${encodeURIComponent(t)}" class="tag is-info is-light mr-1 is-clickable">${t}</a>`)
+    .map(t => `<a href="index?tag=${encodeURIComponent(t)}" class="tag is-info is-light mr-1 is-clickable">${t}</a>`)
     .join("");
     
   headerEl.innerHTML = `

@@ -170,8 +170,13 @@ function initSearchModal() {
 function renderNavbar(config, page) {
   const mount = document.getElementById("site-navbar");
   if (!mount) return;
+  
+  // 核心修复：去掉 page 参数里的 .html，以便和 config.nav 里的无后缀 href 匹配高亮
+  const cleanPage = page.replace(".html", "");
+  
   const navItems = (config.nav || []).map(item => {
-    const active = item.href === page ? " is-active" : "";
+    // 这里改成 item.href === cleanPage
+    const active = item.href === cleanPage ? " is-active" : "";
     return `<a class="navbar-item${active}" href="${item.href}">${item.label}</a>`;
   }).join("");
   
@@ -183,7 +188,8 @@ function renderNavbar(config, page) {
     <nav class="navbar is-fixed-top has-shadow" role="navigation">
       <div class="container">
         <div class="navbar-brand">
-          <a class="navbar-item" href="index.html"><strong>${config.siteTitle}</strong></a>
+          <!-- 核心修改：这里改成 href="index" -->
+          <a class="navbar-item" href="index"><strong>${config.siteTitle}</strong></a>
           <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
             <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
           </a>
@@ -201,7 +207,7 @@ function renderNavbar(config, page) {
         </div>
       </div>
     </nav>`;
-    
+  
   const burger = mount.querySelector(".navbar-burger");
   const menu = mount.querySelector("#navMenu");
   burger.addEventListener("click", () => {

@@ -128,7 +128,7 @@ function renderHomeList(homeData) {
           ${cat.name}
           <span class="posts-group-count">${cat.totalCount} 篇</span>
         </h3>
-        <a href="posts.html?view=series&category=${encodeURIComponent(cat.name)}" class="button is-small is-rounded is-light mt-2">
+        <a href="posts?view=series&category=${encodeURIComponent(cat.name)}" class="button is-small is-rounded is-light mt-2">
           查看全部 <i class="fas fa-arrow-right ml-1" style="font-size:0.8em;"></i>
         </a>
       </div>
@@ -186,7 +186,7 @@ async function initHome() {
           ${greeting}
         </div>
         <br>
-        <a href="about.html" class="button is-small is-rounded is-light">了解更多</a>
+        <a href="about" class="button is-small is-rounded is-light">了解更多</a>
       </div>`;
   }
 
