@@ -1,4 +1,4 @@
----
+﻿---
 title: 程序体积优化规范 (C++)
 date: 2026-11-07
 tags: [C++, 优化, 性能, 底层]
@@ -21,7 +21,7 @@ struct BadStruct {
     double b;       // 8 bytes  
     int c;          // 4 bytes + 4 padding
     char d;         // 1 byte + 7 padding
-};
+}; 
 ```
 ![alt text](/images/cpp-memory-optimization.png)
 
