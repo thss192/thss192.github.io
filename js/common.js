@@ -171,11 +171,9 @@ function renderNavbar(config, page) {
   const mount = document.getElementById("site-navbar");
   if (!mount) return;
   
-  // 核心修复：去掉 page 参数里的 .html，以便和 config.nav 里的无后缀 href 匹配高亮
   const cleanPage = page.replace(".html", "");
   
   const navItems = (config.nav || []).map(item => {
-    // 这里改成 item.href === cleanPage
     const active = item.href === cleanPage ? " is-active" : "";
     return `<a class="navbar-item${active}" href="${item.href}">${item.label}</a>`;
   }).join("");
@@ -184,18 +182,60 @@ function renderNavbar(config, page) {
     `<a class="navbar-item" href="${s.href}" target="_blank" rel="noopener"><span class="icon"><i class="${s.icon}"></i></span><span>${s.label}</span></a>`
   ).join("");
 
+  // 获取文章页的返回按钮数据
+  let postNavAction = "";
+  if (cleanPage === "post" && window.__CURRENT_POST_META__) {
+    const meta = window.__CURRENT_POST_META__;
+    const cat = meta.category;
+    const series = meta.series;
+    
+    if (cat || series) {
+      let url = "posts?view=series";
+      if (cat) url += `&category=${encodeURIComponent(cat)}`;
+      if (series) url += `&series=${encodeURIComponent(series)}`;
+      else if (cat) url += `&series=all`;
+
+      // 拼接展示的文字：比如 "课程笔记 / SQL"
+      let labelText = "";
+      if (cat && series) labelText = `${cat} / ${series}`;
+      else if (cat) labelText = cat;
+      else labelText = series;
+
+      // 为了让按钮好看且不撑爆导航栏，我们通过 style 限制最大宽度
+      postNavAction = `
+        <a href="${url}" class="button is-small is-rounded nav-return-btn" title="返回目录：${labelText}">
+          <span class="icon is-small"><i class="fas fa-folder-open"></i></span>
+          <span class="nav-return-text" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            ${labelText}
+          </span>
+        </a>
+      `;
+    }
+  }
+
   mount.innerHTML = `
     <nav class="navbar is-fixed-top has-shadow" role="navigation">
       <div class="container">
         <div class="navbar-brand">
-          <!-- 核心修改：这里改成 href="index" -->
           <a class="navbar-item" href="index"><strong>${config.siteTitle}</strong></a>
+          
+          <!-- 窄屏显示 -->
+          <div class="navbar-item is-hidden-desktop" style="display: flex; align-items: center; padding: 0 0.5rem;">
+            ${postNavAction}
+          </div>
+
           <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
             <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
           </a>
         </div>
         <div id="navMenu" class="navbar-menu">
-          <div class="navbar-start">${navItems}</div>
+          <div class="navbar-start">
+            ${navItems}
+            <!-- 宽屏显示 -->
+            <div class="navbar-item is-hidden-touch">
+              ${postNavAction}
+            </div>
+          </div>
           <div class="navbar-end">
             ${socialItems}
             <div class="navbar-item">
@@ -207,7 +247,7 @@ function renderNavbar(config, page) {
         </div>
       </div>
     </nav>`;
-  
+    
   const burger = mount.querySelector(".navbar-burger");
   const menu = mount.querySelector("#navMenu");
   burger.addEventListener("click", () => {

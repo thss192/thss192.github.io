@@ -61,3 +61,51 @@
     flex: none !important;
   }
 }
+
+/* ===== 导航栏“返回目录”按钮专属样式 ===== */
+.nav-return-btn {
+  background-color: var(--bulma-primary-soft) !important;
+  color: var(--bulma-primary) !important;
+  border: 1px solid var(--bulma-primary-soft) !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  margin: 0 0.5rem;
+}
+.nav-return-btn:hover {
+  background-color: var(--bulma-primary) !important;
+  color: var(--bulma-primary-invert) !important;
+  transform: translateY(-1px);
+}
+[data-theme="dark"] .nav-return-btn {
+  background-color: rgba(0, 200, 150, 0.15) !important;
+  border-color: rgba(0, 200, 150, 0.3) !important;
+  color: var(--bulma-primary) !important;
+}
+[data-theme="dark"] .nav-return-btn:hover {
+  background-color: var(--bulma-primary) !important;
+  color: var(--bg-dark) !important;
+}
+
+/* ==========================================================================
+   窄屏导航栏布局优化
+   ========================================================================== */
+@media screen and (max-width: 1023px) {
+  /* 让导航栏左侧（Brand 区域）占满剩余空间，防止汉堡菜单被挤压 */
+  #site-navbar .navbar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  #site-navbar .navbar-brand .navbar-item strong {
+    font-size: 1rem; /* 窄屏 Logo 稍微变小一点 */
+  }
+
+  /* 隐藏窄屏下 Navbar brand 里的返回按钮的 padding，使其更紧凑 */
+  #site-navbar .navbar-brand .nav-return-btn {
+    margin: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}

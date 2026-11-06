@@ -316,7 +316,14 @@ async function initPost() {
     if (!res.ok) throw new Error("HTTP " + res.status);
     const raw = await res.text();
     const { meta, body } = parseFrontMatter(raw);
-     renderContent(meta.title || slug, meta.date || "", meta.tags || [], body, meta);
+    
+    // 存下当前文章数据，并让导航栏重新渲染
+    window.__CURRENT_POST_META__ = meta;
+    if (typeof renderNavbar === "function" && window.__CONFIG__) {
+      renderNavbar(window.__CONFIG__, "post.html");
+    }
+
+    renderContent(meta.title || slug, meta.date || "", meta.tags || [], body, meta);
   } catch (e) {
     statusEl.innerHTML = `<div class="notification is-danger">读取文章失败：${e.message}</div>`;
   }
@@ -363,13 +370,9 @@ function renderBreadcrumb(meta) {
   `;
 }
 
-function renderContent(title, date, tags, rawBody, meta) {
+function renderContent(title, date, tags, rawBody) {
   const headerEl = document.getElementById("post-header");
   const bodyEl = document.getElementById("post-body");
-  
-  if (meta) {
-    renderBreadcrumb(meta);
-  }
 
   const readTime = calcReadTime(rawBody);
 
