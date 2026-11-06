@@ -39,6 +39,7 @@
   border-color: var(--border-dark);
 }
 
+/* 右上角：波浪曲线 */
 .content-card::before {
   content: "";
   position: absolute;
@@ -59,9 +60,11 @@
   transition: opacity 0.4s ease;
 }
 .content-card:hover::before { opacity: 0.1; }
+
 [data-theme="dark"] .content-card::before { opacity: 0.08; }
 [data-theme="dark"] .content-card:hover::before { opacity: 0.13; }
 
+/* 保证内容在花纹之上 */
 .content-card > * {
   position: relative;
   z-index: 1;
@@ -70,6 +73,7 @@
 /* 3. 右侧独立卡片 */
 .sidebar-card {
   position: relative;
+  overflow: hidden;
   padding: 1.5rem;
   border-radius: var(--bulma-radius-large);
   background: linear-gradient(135deg, var(--bulma-scheme-main), var(--bulma-scheme-main-bis));
@@ -82,6 +86,32 @@
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
   border-color: var(--bulma-primary-soft);
 }
+
+/* 右上角：可爱四角星 */
+.sidebar-card::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 100px;
+  height: 100px;
+  pointer-events: none;
+  color: var(--bulma-primary);
+  opacity: 0.12;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 10 Q 55 45 90 50 Q 55 55 50 90 Q 45 55 10 50 Q 45 45 50 10 Z' fill='black'/></svg>");
+          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 10 Q 55 45 90 50 Q 55 55 50 90 Q 45 55 10 50 Q 45 45 50 10 Z' fill='black'/></svg>");
+  -webkit-mask-size: contain;
+          mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  transform: rotate(15deg);
+  transition: transform 0.5s ease, opacity 0.3s ease;
+}
+.sidebar-card:hover::before { opacity: 0.22; transform: rotate(45deg) scale(1.1); }
+
+.sidebar-card > * { position: relative; z-index: 1; }
+
 [data-theme="dark"] .sidebar-card {
   background: linear-gradient(135deg, var(--bg-dark-card), var(--bg-dark-card-hover));
   border-color: var(--border-dark);
@@ -90,7 +120,10 @@
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
   border-color: var(--bulma-primary);
 }
+[data-theme="dark"] .sidebar-card::before { opacity: 0.15; }
+[data-theme="dark"] .sidebar-card:hover::before { opacity: 0.25; }
 
+/* 侧边卡片标题 */
 .sidebar-card-title {
   display: flex;
   align-items: center;
@@ -116,6 +149,7 @@
 
 /* ================= 内部元素 ================= */
 
+/* 标签云分隔线 */
 .tag-cloud-inline {
   padding-bottom: 1.5rem;
   border-bottom: 1px dashed var(--bulma-border-weak);
@@ -124,6 +158,7 @@
   border-bottom-color: var(--border-dark);
 }
 
+/* 个人信息 */
 .profile-top {
   display: flex;
   flex-direction: column;
@@ -153,17 +188,24 @@
   color: var(--bulma-primary);
 }
 
+/* ================= 开源项目列表（增加透明度） ================= */
 .profile-projects ul { margin-top: 0.5rem; }
 .profile-projects li {
   padding: 0.5rem 0.6rem;
   margin-bottom: 0.5rem;
   border-radius: var(--bulma-radius);
   border-bottom: 1px dashed var(--bulma-border-weak);
+  /* 初始状态保持完全透明 */
+  background: transparent;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 .profile-projects li:hover {
-  background: var(--bulma-primary-soft);
+  /* 高亮时也使用半透明主题色，跟随当前配色 */
+  background: color-mix(in srgb, var(--bulma-primary) 10%, transparent);
   transform: translateX(3px);
+}
+[data-theme="dark"] .profile-projects li:hover {
+  background: color-mix(in srgb, var(--bulma-primary) 18%, transparent);
 }
 .profile-projects li:last-child {
   border-bottom: none;
@@ -280,7 +322,7 @@
   color: var(--bulma-primary);
 }
 
-/* 右侧导航 */
+/* ================= 右侧导航（增加透明度 / 毛玻璃感） ================= */
 .home-nav-links {
   display: flex;
   flex-direction: column;
@@ -291,18 +333,24 @@
   align-items: center;
   padding: 0.75rem 1rem;
   border-radius: var(--bulma-radius);
-  background: var(--bulma-scheme-main-bis);
-  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 .home-nav-link:hover {
-  background: var(--bulma-primary-soft);
-  border-color: var(--bulma-primary);
+  background: color-mix(in srgb, var(--bulma-primary) 10%, transparent);
+  border-color: color-mix(in srgb, var(--bulma-primary) 30%, transparent);
   transform: translateX(4px);
 }
-[data-theme="dark"] .home-nav-link { background: var(--bg-dark-card-hover); }
-[data-theme="dark"] .home-nav-link:hover { background: rgba(0, 200, 150, 0.1); }
+[data-theme="dark"] .home-nav-link {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .home-nav-link:hover {
+  background: color-mix(in srgb, var(--bulma-primary) 20%, transparent);
+  border-color: color-mix(in srgb, var(--bulma-primary) 40%, transparent);
+}
 
 .nav-icon {
   width: 32px;
@@ -314,10 +362,9 @@
   color: var(--bulma-primary);
   font-size: 1.1rem;
   margin-right: 0.75rem;
-  background: var(--bulma-scheme-main);
+  background: transparent;
   flex-shrink: 0;
 }
-[data-theme="dark"] .nav-icon { background: var(--bg-dark-card); }
 
 .nav-text { flex: 1; display: flex; flex-direction: column; }
 .nav-title { font-weight: 700; font-size: 0.9rem; color: var(--bulma-text-strong); }
