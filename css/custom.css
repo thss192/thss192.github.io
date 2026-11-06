@@ -176,16 +176,17 @@ body.sky-tinted.sky-night {
 }
 .timeline-card:nth-child(2n):hover::before { transform: rotate(72deg) scale(1.12); }
 
-/* 右下角：小圆点星点缀 */
+/* 右下角：散落星光点缀 */
 .timeline-card::after {
-  content: ""; position: absolute; bottom: -10px; right: 20px; width: 46px; height: 46px;
-  pointer-events: none; color: var(--bulma-primary); opacity: 0.08; background-color: currentColor;
-  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><circle cx='50' cy='20' r='6'/><circle cx='78' cy='38' r='4'/><circle cx='70' cy='72' r='5'/><circle cx='32' cy='70' r='4'/><circle cx='22' cy='38' r='5'/><circle cx='50' cy='50' r='3'/></g></svg>");
-          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><circle cx='50' cy='20' r='6'/><circle cx='78' cy='38' r='4'/><circle cx='70' cy='72' r='5'/><circle cx='32' cy='70' r='4'/><circle cx='22' cy='38' r='5'/><circle cx='50' cy='50' r='3'/></g></svg>");
+  content: ""; position: absolute; bottom: -10px; right: 15px; width: 50px; height: 50px;
+  pointer-events: none; color: var(--bulma-primary); opacity: 0.1; background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><path d='M30 10 Q 32 28 50 30 Q 32 32 30 50 Q 28 32 10 30 Q 28 28 30 10 Z'/><path d='M75 45 Q 76 59 90 60 Q 76 61 75 75 Q 74 61 60 60 Q 74 59 75 45 Z' opacity='0.7'/><path d='M40 70 Q 41 79 50 80 Q 41 81 40 90 Q 39 81 30 80 Q 39 79 40 70 Z' opacity='0.4'/></g></svg>");
+          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><path d='M30 10 Q 32 28 50 30 Q 32 32 30 50 Q 28 32 10 30 Q 28 28 30 10 Z'/><path d='M75 45 Q 76 59 90 60 Q 76 61 75 75 Q 74 61 60 60 Q 74 59 75 45 Z' opacity='0.7'/><path d='M40 70 Q 41 79 50 80 Q 41 81 40 90 Q 39 81 30 80 Q 39 79 40 70 Z' opacity='0.4'/></g></svg>");
   -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  transform: rotate(0deg);
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
-.timeline-card:hover::after { opacity: 0.14; transform: scale(1.1); }
+.timeline-card:hover::after { opacity: 0.18; transform: rotate(15deg) scale(1.1); }
 
 .timeline-card-title {
   font-size: 1.02rem; font-weight: 700; color: var(--bulma-text-strong); line-height: 1.4; padding-right: 2.5rem;
@@ -214,8 +215,8 @@ body.sky-tinted.sky-night {
 [data-theme="dark"] .timeline-card:hover { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(0, 200, 150, 0.15); border-color: var(--bulma-primary); }
 [data-theme="dark"] .timeline-card::before { opacity: 0.18; }
 [data-theme="dark"] .timeline-card:hover::before { opacity: 0.35; }
-[data-theme="dark"] .timeline-card::after { opacity: 0.1; }
-[data-theme="dark"] .timeline-card:hover::after { opacity: 0.18; }
+[data-theme="dark"] .timeline-card::after { opacity: 0.12; }
+[data-theme="dark"] .timeline-card:hover::after { opacity: 0.25; }
 [data-theme="dark"] .timeline-card-date { background: rgba(0, 200, 150, 0.12); }
 [data-theme="dark"] .timeline-card-tags .tag { border-color: var(--bulma-primary) !important; color: var(--bulma-primary) !important; }
 [data-theme="dark"] .timeline-card:hover .timeline-card-tags .tag { background-color: var(--bulma-primary) !important; color: var(--bg-dark) !important; }
@@ -416,4 +417,122 @@ body.sky-tinted.sky-night {
 
 @media screen and (max-width: 900px) {
   .posts-cards, #post-list .posts-cards { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================================
+   10. 项目页 & 友链页卡片美化
+   ========================================================================== */
+
+/* 统一卡片基础样式（加入径向渐变底色） */
+#project-list .card,
+#link-list .card {
+  position: relative;
+  overflow: hidden;
+  /* 【核心优化】亮色模式下，右上角微微透出一点主题色 */
+  background: radial-gradient(circle at 100% 0%, var(--bulma-primary-soft) 0%, transparent 40%), 
+              linear-gradient(135deg, var(--bulma-scheme-main), var(--bulma-scheme-main-bis));
+  border: 1.5px solid var(--bulma-border);
+  border-radius: var(--bulma-radius-large);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              box-shadow 0.3s ease, 
+              border-color 0.3s ease;
+}
+
+/* 悬停时上浮、加阴影、变主题色边框 */
+#project-list .card:hover,
+#link-list .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 0 0 3px var(--bulma-primary-soft);
+  border-color: var(--bulma-primary);
+}
+
+/* 暗色模式下的背景与边框 */
+[data-theme="dark"] #project-list .card,
+[data-theme="dark"] #link-list .card {
+  background: radial-gradient(circle at 100% 0%, rgba(0, 200, 150, 0.08) 0%, transparent 45%), 
+              linear-gradient(135deg, var(--bg-dark-card), var(--bg-dark-card-hover));
+  border-color: #3a3a3a;
+}
+[data-theme="dark"] #project-list .card:hover,
+[data-theme="dark"] #link-list .card:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(0, 200, 150, 0.15);
+  border-color: var(--bulma-primary);
+}
+
+/* ================= 卡片花纹：散落的星光 ================= */
+#project-list .card::before,
+#link-list .card::before {
+  content: ""; position: absolute; top: -15px; right: -15px; width: 90px; height: 90px;
+  pointer-events: none; color: var(--bulma-primary); 
+  
+  /* 【核心优化】亮色模式下透明度从 0.08 提高到 0.15 */
+  opacity: 0.15; 
+  
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><path d='M30 10 Q 32 28 50 30 Q 32 32 30 50 Q 28 32 10 30 Q 28 28 30 10 Z'/><path d='M75 45 Q 76 59 90 60 Q 76 61 75 75 Q 74 61 60 60 Q 74 59 75 45 Z' opacity='0.7'/><path d='M40 70 Q 41 79 50 80 Q 41 81 40 90 Q 39 81 30 80 Q 39 79 40 70 Z' opacity='0.4'/></g></svg>");
+          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><path d='M30 10 Q 32 28 50 30 Q 32 32 30 50 Q 28 32 10 30 Q 28 28 30 10 Z'/><path d='M75 45 Q 76 59 90 60 Q 76 61 75 75 Q 74 61 60 60 Q 74 59 75 45 Z' opacity='0.7'/><path d='M40 70 Q 41 79 50 80 Q 41 81 40 90 Q 39 81 30 80 Q 39 79 40 70 Z' opacity='0.4'/></g></svg>");
+  -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  transform: rotate(0deg);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* 悬停时花纹变得更亮并微微旋转 */
+#project-list .card:hover::before,
+#link-list .card:hover::before {
+  opacity: 0.25; transform: rotate(15deg) scale(1.1);
+}
+
+/* 暗色模式下的花纹透明度适配 */
+[data-theme="dark"] #project-list .card::before,
+[data-theme="dark"] #link-list .card::before { opacity: 0.12; }
+[data-theme="dark"] #project-list .card:hover::before,
+[data-theme="dark"] #link-list .card:hover::before { opacity: 0.22; }
+
+/* 保证内容在星光花纹之上 */
+#project-list .card-content,
+#project-list .card-footer,
+#link-list .card-content,
+#link-list .card-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ================= 内部细节优化 ================= */
+
+/* 项目卡片底部的操作栏（按钮） */
+#project-list .card-footer {
+  border-top: 1px dashed var(--bulma-border-weak);
+}
+[data-theme="dark"] #project-list .card-footer {
+  border-top-color: var(--border-dark);
+}
+
+#project-list .card-footer-item {
+  font-weight: 600;
+  color: var(--bulma-primary);
+  transition: background-color 0.2s ease;
+}
+#project-list .card-footer-item:hover {
+  background-color: var(--bulma-primary-soft);
+}
+
+/* 友链卡片的“访问网站”按钮 */
+#link-list .card .button.is-light {
+  transition: all 0.2s ease;
+}
+#link-list .card:hover .button.is-light {
+  background-color: var(--bulma-primary-soft) !important;
+  color: var(--bulma-primary) !important;
+  border-color: var(--bulma-primary) !important;
+}
+[data-theme="dark"] #link-list .card .button.is-light {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--bulma-text-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] #link-list .card:hover .button.is-light {
+  background-color: rgba(0, 200, 150, 0.15) !important;
+  color: var(--bulma-primary) !important;
+  border-color: rgba(0, 200, 150, 0.3) !important;
 }
