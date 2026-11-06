@@ -503,7 +503,14 @@ window.closeTagDrawer = function() {
 
 /* ================= 初始化 ================= */
 async function initPosts() {
-  await initLayout("posts.html");
+   const config = await initLayout("posts.html");
+
+  // 核心修复：读取 config.json 中的 postsPage 配置，渲染标题和副标题
+  const pp = ((config && config.pageCopy) || {}).postsPage || {};
+  const titleEl = document.getElementById("posts-title-text");
+  const subtitleEl = document.getElementById("page-subtitle");
+  if (titleEl) titleEl.textContent = pp.title || "全部文章";
+  if (subtitleEl) subtitleEl.textContent = pp.subtitle || "记录代码、思考与生活的碎片。";
 
   try {
     ALL_POSTS = await loadPostIndex();

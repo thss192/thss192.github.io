@@ -37,6 +37,11 @@
       "label": "GitHub",
       "href": "https://github.com/thss192",
       "icon": "fab fa-github"
+    },
+    {
+      "label": "Bilibili",
+      "href": "https://space.bilibili.com/3461575526582340",
+      "icon": "fab fa-bilibili"
     }
   ],
   "theme": {
@@ -66,6 +71,8 @@
       "browserTitle": "文章"
     },
     "guestbookPage": {
+      "title": "留言板",
+      "subtitle": "留下你的足迹，随便聊聊。",
       "browserTitle": "留言板"
     },
     "projectsPage": {

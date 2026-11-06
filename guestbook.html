@@ -42,9 +42,9 @@
       <div class="container">
         <h1 class="title is-2 mb-3" style="color: inherit;">
           <span class="icon has-text-primary mr-2" style="color: inherit;"><i class="fas fa-comments"></i></span>
-          留言板
+          <span id="posts-title-text"></span>
         </h1>
-        <p class="subtitle is-5" style="color: inherit; opacity: 0.8;">留下你的足迹，随便聊聊。</p>
+        <p id="page-subtitle" class="subtitle is-5" style="color: inherit; opacity: 0.8;"></p>
       </div>
     </div>
   </section>
@@ -73,19 +73,26 @@
   <script>
     document.addEventListener("DOMContentLoaded", async function() {
       // 1. 初始化公共布局（导航栏、页脚、搜索框）
-      await initLayout("guestbook.html");
+      const config = await initLayout("guestbook.html");
       
-      // 2. 动态注入 Giscus 脚本
+      // 2. 读取 config.json 中的 guestbookPage 配置，渲染标题和副标题
+      const gp = ((config && config.pageCopy) || {}).guestbookPage || {};
+      const titleEl = document.getElementById("posts-title-text");
+      const subtitleEl = document.getElementById("page-subtitle");
+      if (titleEl) titleEl.textContent = gp.title || "留言板";
+      if (subtitleEl) subtitleEl.textContent = gp.subtitle || "留下你的足迹，随便聊聊。";
+
+      // 3. 动态注入 Giscus 脚本
       const giscusScript = document.createElement("script");
       giscusScript.src = "https://giscus.app/client.js";
       giscusScript.setAttribute("data-repo", "thss192/thss192.github.io");
       giscusScript.setAttribute("data-repo-id", "R_kgDOVW1aCw");
       
-      // 【修改点 1】：换成允许陌生人发帖的 Comments 分类
+      // 使用允许陌生人发帖的 Comments 分类
       giscusScript.setAttribute("data-category", "Comments");
       giscusScript.setAttribute("data-category-id", "DIC_kwDOVW1aC84DKdgr"); 
       
-      // 【修改点 2】：使用特定字符串，并固定为 guestbook，保证所有人的评论都在同一个帖子里
+      // 使用特定字符串，并固定为 guestbook，保证所有人的评论都在同一个帖子里
       giscusScript.setAttribute("data-mapping", "specific");
       giscusScript.setAttribute("data-term", "guestbook");
       
@@ -100,7 +107,7 @@
       
       document.getElementById("giscus-mount").appendChild(giscusScript);
 
-      // 3. 定义一个强力的主题同步函数
+      // 4. 定义一个强力的主题同步函数
       const syncThemeToGiscus = () => {
         const isDark = document.documentElement.getAttribute("data-theme") === "dark";
         const theme = isDark ? "transparent_dark" : "light";
@@ -114,10 +121,10 @@
         }
       };
 
-      // 4. 延迟强推一次主题
+      // 5. 延迟强推一次主题
       setTimeout(syncThemeToGiscus, 1000);
 
-      // 5. 监听博客的主题切换
+      // 6. 监听博客的主题切换
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (mutation.attributeName === "data-theme") {
