@@ -1,4 +1,4 @@
-﻿// 极致性能版 Particle Effects (仅五角星使用预渲染)
+﻿// 极致性能版 Particle Effects (纯白发光矢量星星)
 (function () {
   const canvas = document.createElement("canvas");
   canvas.id = "effects-canvas";
@@ -31,75 +31,7 @@
   window.addEventListener("resize", resize);
   resize();
 
-  // ==========================================
-  // 仅针对五角星（meteor）的预渲染模板
-  // ==========================================
-  const starCanvas = document.createElement("canvas");
-  starCanvas.width = 100;
-  starCanvas.height = 100;
-  const starCtx = starCanvas.getContext("2d");
-  
-  (function drawStarTemplate() {
-    const cx = 50, cy = 50;
-    const R = 45;          // 外顶点半径
-    const r = 22;          // 内凹点半径
-    const points = 5;
-    
-    // 1. 星体轮廓
-    starCtx.beginPath();
-    for (let i = 0; i < points * 2; i++) {
-      const radius = i % 2 === 0 ? R : r;
-      const angle = (i * Math.PI) / points - Math.PI / 2;
-      const x = cx + Math.cos(angle) * radius;
-      const y = cy + Math.sin(angle) * radius;
-      if (i === 0) starCtx.moveTo(x, y);
-      else starCtx.lineTo(x, y);
-    }
-    starCtx.closePath();
-    
-    // 2. 模拟发光（代替高消耗的 shadowBlur）
-    const glowGrad = starCtx.createRadialGradient(cx, cy, 10, cx, cy, 50);
-    glowGrad.addColorStop(0, "rgba(255, 225, 100, 0.8)");
-    glowGrad.addColorStop(1, "rgba(255, 225, 100, 0)");
-    starCtx.fillStyle = glowGrad;
-    starCtx.fill();
-    
-    // 3. 星星本体填充与描边
-    starCtx.fillStyle = "rgba(255, 245, 150, 1)";
-    starCtx.fill();
-    starCtx.lineWidth = 3;
-    starCtx.strokeStyle = "rgba(255, 195, 0, 1)";
-    starCtx.lineJoin = "round";
-    starCtx.stroke();
-
-    // 4. 豆豆眼
-    const eyeY = 46;
-    const eyeSpacing = 10;
-    const eyeRadius = 5;
-
-    starCtx.fillStyle = "#333";
-    starCtx.beginPath();
-    starCtx.arc(cx - eyeSpacing, eyeY, eyeRadius, 0, Math.PI * 2);
-    starCtx.arc(cx + eyeSpacing, eyeY, eyeRadius, 0, Math.PI * 2);
-    starCtx.fill();
-
-    // 5. 眼神高光
-    starCtx.fillStyle = "#fff";
-    starCtx.beginPath();
-    starCtx.arc(cx - eyeSpacing + 1.5, eyeY - 1.5, 1.8, 0, Math.PI * 2);
-    starCtx.arc(cx + eyeSpacing + 1.5, eyeY - 1.5, 1.8, 0, Math.PI * 2);
-    starCtx.fill();
-
-    // 6. 腮红
-    starCtx.fillStyle = "rgba(255, 100, 150, 0.6)";
-    starCtx.beginPath();
-    starCtx.ellipse(cx - eyeSpacing * 1.6, eyeY + 6, 3.5, 2, 0, 0, Math.PI * 2);
-    starCtx.ellipse(cx + eyeSpacing * 1.6, eyeY + 6, 3.5, 2, 0, 0, Math.PI * 2);
-    starCtx.fill();
-  })();
-  // ==========================================
-
-  // 算法生成雪花（保持实时绘制）
+  // 算法生成雪花
   function drawSnowflake(ctx, size, alpha) {
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -133,6 +65,50 @@
     ctx.stroke();
   }
 
+  // 纯白高光矢量星星（无 blur，极低消耗）
+  function drawWhiteStar(ctx, size, alpha) {
+    const R = size;          
+    const r = size * 0.45;   
+    const points = 5;
+    
+    // 画外圈柔光（用半透明填充模拟，代替极耗性能的 blur）
+    ctx.beginPath();
+    for (let i = 0; i < points * 2; i++) {
+      const radius = i % 2 === 0 ? R : r;
+      const angle = (i * Math.PI) / points - Math.PI / 2;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+
+    // 1. 填充半透明白底
+    ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.3})`;
+    ctx.fill();
+
+    // 2. 实心纯白星星
+    ctx.beginPath();
+    const r2 = r * 0.85; // 内缩一点
+    for (let i = 0; i < points * 2; i++) {
+      const radius = i % 2 === 0 ? R * 0.85 : r2;
+      const angle = (i * Math.PI) / points - Math.PI / 2;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+    ctx.fill();
+
+    // 3. 极细的高光描边增加锐利度
+    ctx.lineWidth = Math.max(1, size * 0.05);
+    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.9})`;
+    ctx.lineJoin = "round";
+    ctx.stroke();
+  }
+
   class Particle {
     constructor(type, isClick) {
       this.type = type;
@@ -142,8 +118,8 @@
       
       this.size = isClick ? Math.random() * 8 + 6 : Math.random() * 6 + 4;
       
-      // 五角星（meteor）尺寸调大，因为贴图好看
-      if (type === "meteor") this.size = Math.random() * 6 + 12; 
+      // 白色星星尺寸调大一点更有质感
+      if (type === "meteor") this.size = Math.random() * 6 + 10; 
       if (type === "snow") this.size = Math.random() * 5 + 4;
 
       if (isClick) {
@@ -201,7 +177,7 @@
       ctx.rotate(this.rotation);
 
       if (this.type === "star") {
-        // 普通十字星：实时绘制
+        // 十字星：跟随主题色
         ctx.shadowBlur = 10;
         ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${alpha * 0.8})`;
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
@@ -218,7 +194,7 @@
         ctx.shadowBlur = 0;
 
       } else if (this.type === "heart") {
-        // 爱心：实时绘制
+        // 爱心
         ctx.fillStyle = `rgba(255, 77, 109, ${alpha})`;
         ctx.beginPath();
         ctx.moveTo(0, this.size * 0.3);
@@ -228,7 +204,7 @@
         ctx.bezierCurveTo(this.size, -this.size * 0.2, 0, 0, 0, this.size * 0.3);
         ctx.fill();
       } else if (this.type === "flower") {
-        // 花朵：实时绘制
+        // 花朵
         ctx.fillStyle = `rgba(255, 183, 197, ${alpha})`;
         ctx.beginPath();
         const petals = 5;
@@ -240,13 +216,11 @@
         }
         ctx.fill();
       } else if (this.type === "snow") {
-        // 雪花：实时绘制
+        // 雪花
         drawSnowflake(ctx, this.size, alpha);
       } else if (this.type === "meteor") {
-        // 五角星：直接贴图（预渲染），性能极佳
-        ctx.globalAlpha = alpha;
-        const s = this.size * 2.2; 
-        ctx.drawImage(starCanvas, -s/2, -s/2, s, s);
+        // 纯白发光星星（极速矢量绘制）
+        drawWhiteStar(ctx, this.size, alpha);
       }
       ctx.restore();
     }
@@ -303,7 +277,7 @@
 
   window.__setEffectOpacity = (val) => {
     currentOpacity = parseFloat(val);
-    localStorage.setItem("effect_opacity", currentOpacity);
+    localStorage.setItem("effect_opacity", val);
   };
 
   setTimeout(() => {
