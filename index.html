@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/custom.css" />
   <link rel="stylesheet" href="css/custom-themes.css" />
   <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/posts.css" />
   <script>
     (function() {
       var mode = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -46,42 +47,60 @@
   </section>
 
   <section class="section pt-5" style="position: relative;">
-    <div class="container">
-      <div class="columns is-variable is-8">
+    <div class="container" style="max-width: 1400px;">
+      
+      <div class="home-split-layout">
         
-        <!-- 左侧：个人名片 + 最新文章 -->
-        <div class="column is-8">
-          
-          <!-- 个人名片（C位） -->
-          <div id="sidebar-profile" class="mb-6"></div>
+        <!-- 左侧：合并了标签云和最新文章的大卡片 -->
+        <div class="home-main-content">
+          <div class="box mb-5 content-card">
+            
+            <!-- 标签云部分 -->
+            <div class="tag-cloud-inline mb-5">
+              <div class="is-flex is-align-items-center mb-3">
+                <h3 class="title is-6 mb-0"><i class="fas fa-cloud has-text-primary mr-2"></i>标签云</h3>
+              </div>
+              <div id="tag-cloud-container" class="tag-cloud-wrapper"></div>
+            </div>
 
-          <!-- 最近动态 -->
-          <div class="is-flex is-align-items-center mb-4">
-            <h2 class="title is-4 mb-0"><i class="fas fa-feather-alt has-text-primary mr-2"></i>最近写了什么</h2>
+            <!-- 最新文章部分 -->
+            <div class="is-flex is-align-items-center mb-4">
+              <h3 class="title is-5 mb-0"><i class="fas fa-feather-alt has-text-primary mr-2"></i>最近写了什么</h3>
+            </div>
+            <div id="latest-posts" class="home-latest-list"></div>
+            
+            <div class="has-text-centered mt-6">
+              <a href="posts" class="button is-rounded is-light px-5">
+                查看全部文章 <i class="fas fa-arrow-right ml-2" style="font-size:0.8em;"></i>
+              </a>
+            </div>
+            <div id="post-status"></div>
           </div>
-          <div id="latest-posts" class="posts-cards"></div>
-          <div class="has-text-right mt-4">
-            <a href="posts" class="button is-small is-rounded is-light">
-              查看全部文章 <i class="fas fa-arrow-right ml-1" style="font-size:0.8em;"></i>
-            </a>
-          </div>
-          <div id="post-status"></div>
         </div>
 
-        <!-- 右侧：侧边栏 -->
-        <div class="column is-4">
+        <!-- 右侧：分成三个独立卡片的布局 -->
+        <div class="home-sidebar-content">
           
-          <!-- 快捷导航面板 -->
-          <div class="box mb-5 home-quick-nav-box" style="border-radius: var(--bulma-radius-large);">
-            <h3 class="title is-6 mb-3"><i class="fas fa-compass has-text-primary mr-2"></i>探索博客</h3>
+          <!-- 独立卡片 1：个人信息 -->
+          <div class="box sidebar-card">
+            <div id="sidebar-profile-top"></div>
+          </div>
+
+          <!-- 独立卡片 2：开源项目 -->
+          <div class="box sidebar-card">
+            <div id="sidebar-projects"></div>
+          </div>
+          
+          <!-- 独立卡片 3：探索博客 -->
+          <div class="box sidebar-card">
+            <h3 class="sidebar-card-title"><i class="fas fa-compass has-text-primary mr-2"></i>探索博客</h3>
             <div class="home-nav-links">
               <a href="posts?view=series" class="home-nav-link">
                 <div class="nav-icon"><i class="fas fa-layer-group"></i></div>
                 <div class="nav-text">
                   <span class="nav-title">分类目录</span>
-                  <span class="nav-desc">按系列浏览全部文章</span>
+                  <span class="nav-desc">按系列浏览</span>
                 </div>
-                <i class="fas fa-chevron-right nav-arrow"></i>
               </a>
               <a href="posts?view=time" class="home-nav-link">
                 <div class="nav-icon"><i class="fas fa-clock"></i></div>
@@ -89,22 +108,14 @@
                   <span class="nav-title">时间归档</span>
                   <span class="nav-desc">顺着时间线回顾</span>
                 </div>
-                <i class="fas fa-chevron-right nav-arrow"></i>
               </a>
             </div>
           </div>
 
-          <!-- 开源项目 -->
-          <div class="box mb-5" style="border-radius: var(--bulma-radius-large);">
-            <h3 class="title is-5 mb-3"><i class="fas fa-code-branch has-text-primary mr-2"></i>开源项目</h3>
-            <ul id="sidebar-projects" class="menu-list"></ul>
-            <div class="has-text-right mt-3">
-              <a href="projects" class="is-size-7 has-text-link">查看全部 →</a>
-            </div>
-          </div>
-
         </div>
+
       </div>
+
     </div>
   </section>
 

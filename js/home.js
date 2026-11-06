@@ -1,6 +1,5 @@
-﻿// 首页：门户式布局，突出个人名片与最新文章
+﻿// 首页：新布局逻辑（拆分右侧渲染节点）
 let ALL_POSTS = [];
-let SITE_CONFIG = {};
 
 async function loadPostIndex() {
   try {
@@ -39,11 +38,28 @@ function getDynamicGreeting() {
   return "🌙 夜深了，早点休息哦";
 }
 
-// 生成统一的网格卡片
 function renderCard(post) {
   const tags = (post.tags || []).map(t => `<span class="tag is-info is-light">${t}</span>`).join("");
+
+  // 分类/系列徽章（绝对定位到卡片右上角）
+  let seriesHtml = "";
+  if (post.category && post.series) {
+    seriesHtml = `<span class="timeline-card-series">
+      <i class="fas fa-folder-open"></i> ${post.category} / ${post.series}
+    </span>`;
+  } else if (post.category) {
+    seriesHtml = `<span class="timeline-card-series">
+      <i class="fas fa-folder"></i> ${post.category}
+    </span>`;
+  } else if (post.series) {
+    seriesHtml = `<span class="timeline-card-series">
+      <i class="fas fa-folder"></i> ${post.series}
+    </span>`;
+  }
+
   return `
     <a class="timeline-card" href="post?slug=${encodeURIComponent(post.slug)}">
+      ${seriesHtml}
       <div class="timeline-card-title">${post.title}</div>
       ${post.summary ? `<div class="timeline-card-summary">${post.summary}</div>` : ""}
       <div class="timeline-card-meta">
@@ -53,90 +69,190 @@ function renderCard(post) {
     </a>`;
 }
 
-// 渲染最新的文章列表
 function renderLatestPosts(posts) {
   const listEl = document.getElementById("latest-posts");
   if (!listEl) return;
+  const latest = posts.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+  listEl.innerHTML = latest.map(p => renderCard(p)).join("");
+}
 
-  // 按时间倒序取最新 4 篇
-  const latest = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+// ================= 交互式标签云引擎 =================
+function initInteractiveTagCloud(posts) {
+  const container = document.getElementById("tag-cloud-container");
+  if (!container) return;
+  container.innerHTML = "";
 
-  if (latest.length === 0) {
-    listEl.innerHTML = `<div class="notification is-warning">还没有文章。</div>`;
+  const tagMap = new Map();
+  posts.forEach(p => {
+    (p.tags || []).forEach(t => tagMap.set(t, (tagMap.get(t) || 0) + 1));
+  });
+
+  if (tagMap.size === 0) {
+    container.innerHTML = `<span class="is-size-7 has-text-grey">暂无标签</span>`;
     return;
   }
 
-  listEl.innerHTML = latest.map(p => renderCard(p)).join("");
+  const sortedTags = Array.from(tagMap.entries()).sort((a, b) => b[1] - a[1]);
+
+  sortedTags.forEach(([tag, count]) => {
+    const tagEl = document.createElement("button");
+    tagEl.className = "tag-cloud-chip";
+    tagEl.innerHTML = `
+      <span class="tag-name"># ${tag}</span>
+      <span class="tag-count">${count}</span>
+    `;
+    tagEl.addEventListener("click", () => {
+      if (window.openTagDrawer) window.openTagDrawer(encodeURIComponent(tag));
+    });
+    container.appendChild(tagEl);
+  });
+}
+
+// ================= 右侧：个人信息 + 开源项目 =================
+async function renderSidebar(config) {
+  const profileTopEl = document.getElementById("sidebar-profile-top");
+  const projectsEl = document.getElementById("sidebar-projects");
+  if (!profileTopEl || !projectsEl) return;
+
+  const a = (config && config.author) || {};
+  const greeting = getDynamicGreeting();
+
+  let projects = [];
+  try {
+    const res = await fetch("data/projects.json");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    projects = await res.json();
+  } catch (e) {
+    console.warn("读取 projects.json 失败，使用兜底数据", e);
+    projects = window.__PROJECTS_FALLBACK__ || [];
+  }
+
+  // 卡片1：个人信息
+  profileTopEl.innerHTML = `
+    <div class="profile-top">
+      <a href="about" class="flex-shrink-0" title="点击了解我">
+        <figure class="image is-128x128 mx-auto">
+          <img class="is-rounded" src="${a.avatar || "images/avatar.png"}" style="object-fit: cover;" alt="头像">
+        </figure>
+      </a>
+      <div>
+        <h3 class="title is-4 mb-1">${a.name || "佚名"}</h3>
+        <p class="is-size-6 has-text-grey mb-3">${a.bio || "开发者"}</p>
+        <div class="profile-greeting">
+          ${greeting}
+        </div>
+      </div>
+    </div>`;
+
+  // 卡片2：开源项目
+  const projectListHtml = projects.length
+    ? projects.slice(0, 2).map(p => `
+        <li>
+          <a href="${p.url}" target="_blank" rel="noopener" class="is-size-6 has-text-weight-bold">${p.name}</a>
+          <p class="is-size-7 has-text-grey mt-1">${p.description || ""}</p>
+        </li>
+      `).join("")
+    : `<li class="is-size-7 has-text-grey">暂无项目</li>`;
+
+  projectsEl.innerHTML = `
+    <div class="profile-projects">
+      <h4 class="sidebar-card-title">
+        <i class="fas fa-code-branch has-text-primary mr-2"></i>开源项目
+      </h4>
+      <ul class="menu-list mb-0">${projectListHtml}</ul>
+      <div class="has-text-left mt-2">
+        <a href="projects" class="is-size-7 has-text-link">查看全部 →</a>
+      </div>
+    </div>`;
 }
 
 async function initHome() {
   const config = await initLayout("index.html");
 
-  // 1. 渲染 Hero 打字机
+  // Hero 打字机
   const hero = (config && config.hero) || {};
   const heroTitle = document.getElementById("hero-title");
   const heroSubtitle = document.getElementById("hero-subtitle");
   if (heroTitle) {
-    const textToType = hero.title || "";
     heroTitle.innerHTML = '<span id="typewriter-text"></span><span class="cursor" style="display:inline-block;width:3px;height:1em;background:var(--bulma-primary);vertical-align:text-bottom;margin-left:2px;animation:blink 0.8s infinite;"></span>';
-    typeWriter(document.getElementById("typewriter-text"), textToType, 100);
+    typeWriter(document.getElementById("typewriter-text"), hero.title || "", 100);
   }
   if (heroSubtitle) heroSubtitle.textContent = hero.subtitle || "";
 
-  SITE_CONFIG = config || {};
+  // 右侧卡片（个人信息 + 项目），不阻塞左侧文章列表
+  renderSidebar(config);
+
+  // 左侧文章与标签云
   const statusEl = document.getElementById("post-status");
-  const profileEl = document.getElementById("sidebar-profile");
-  const sidebarProjects = document.getElementById("sidebar-projects");
-
-  // 2. 渲染侧边栏项目
-  if (sidebarProjects) {
-    let projects = [];
-    try {
-      const res = await fetch("data/projects.json");
-      if (res.ok) projects = await res.json();
-    } catch (e) {
-      projects = window.__PROJECTS_FALLBACK__ || [];
-    }
-    sidebarProjects.innerHTML = projects.slice(0, 2).map(p => `
-      <li class="mb-2">
-        <a href="${p.url}" target="_blank" class="is-size-6">${p.name}</a>
-        <p class="is-size-7 has-text-grey">${p.description || ""}</p>
-      </li>
-    `).join("");
-  }
-
-  // 3. 渲染左侧个人名片（更宽大、更像横幅）
-  if (profileEl && config && config.author) {
-    const a = config.author;
-    const greeting = getDynamicGreeting();
-      profileEl.innerHTML = `
-      <div class="profile-banner">
-        <figure class="image is-96x96 flex-shrink-0">
-          <img class="is-rounded" src="${a.avatar || "images/avatar.png"}" style="object-fit: cover;">
-        </figure>
-        <div>
-          <h3 class="title is-4 mb-1">${a.name || "佚名"}</h3>
-          <p class="is-size-6 has-text-grey mb-2">${a.bio || "开发者"}</p>
-          <div class="has-text-primary is-size-7 font-weight-bold" style="background: var(--bulma-primary-soft); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block;">
-            ${greeting}
-          </div>
-          <a href="about" class="button is-small is-rounded is-light ml-3">了解更多</a>
-        </div>
-      </div>`;
-  }
-
-  // 4. 获取文章并渲染最近动态
   try {
     ALL_POSTS = await loadPostIndex();
     if (ALL_POSTS.length === 0) {
-      statusEl.innerHTML = `<div class="notification is-warning">还没有文章。</div>`;
+      if (statusEl) statusEl.innerHTML = `<div class="notification is-warning">还没有文章。</div>`;
       return;
     }
-    
     renderLatestPosts(ALL_POSTS);
+    initInteractiveTagCloud(ALL_POSTS);
   } catch (e) {
-    statusEl.innerHTML = `<div class="notification is-danger">读取文章清单失败：${e.message}</div>`;
+    if (statusEl) statusEl.innerHTML = `<div class="notification is-danger">读取文章清单失败：${e.message}</div>`;
   }
 }
+
+// ================= 标签文章列表浮窗 =================
+window.openTagDrawer = async function(encodedTag) {
+  const tag = decodeURIComponent(encodedTag);
+
+  if (document.getElementById("tag-drawer")) {
+    window.closeTagDrawer();
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  if (!ALL_POSTS || ALL_POSTS.length === 0) {
+    console.warn("文章清单尚未加载，无法按标签筛选");
+    return;
+  }
+
+  const allFiltered = ALL_POSTS
+    .filter(p => (p.tags || []).includes(tag))
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const listHtml = allFiltered.length === 0
+    ? `<div class="has-text-grey p-4 is-size-7">没有找到相关文章。</div>`
+    : allFiltered.map(p => `
+        <a href="post?slug=${encodeURIComponent(p.slug)}" class="drawer-item">
+          <div class="drawer-item-title">${p.title}</div>
+          <div class="drawer-item-date">${p.date}</div>
+        </a>
+      `).join("");
+
+  const drawerHtml = `
+    <div id="tag-drawer" class="tag-drawer-panel">
+      <div class="drawer-header">
+        <span class="is-size-6 has-text-weight-bold"><i class="fas fa-tags mr-2"></i>标签：${tag}</span>
+        <button class="delete" onclick="window.closeTagDrawer()"></button>
+      </div>
+      <div class="drawer-body">${listHtml}</div>
+    </div>
+    <div id="tag-drawer-backdrop" onclick="window.closeTagDrawer()"></div>
+  `;
+  document.body.insertAdjacentHTML("beforeend", drawerHtml);
+
+  setTimeout(() => {
+    const panel = document.getElementById("tag-drawer");
+    const backdrop = document.getElementById("tag-drawer-backdrop");
+    if (panel) panel.classList.add("is-open");
+    if (backdrop) backdrop.classList.add("is-open");
+  }, 20);
+};
+
+window.closeTagDrawer = function() {
+  const panel = document.getElementById("tag-drawer");
+  const backdrop = document.getElementById("tag-drawer-backdrop");
+  if (panel) panel.classList.remove("is-open");
+  if (backdrop) backdrop.classList.remove("is-open");
+  setTimeout(() => {
+    if (panel) panel.remove();
+    if (backdrop) backdrop.remove();
+  }, 300);
+};
 
 initHome();
