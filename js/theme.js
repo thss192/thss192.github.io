@@ -9,8 +9,6 @@
     { id: "sunset",  label: "落日" },
     { id: "mono",    label: "极简" },
   ];
-  
-  // 特效按钮全部使用 Emoji
   const EFFECTS = [
     { id: "none",   label: "关闭", icon: "🚫" },
     { id: "star",   label: "星空", icon: "✨" },
@@ -19,22 +17,30 @@
     { id: "snow",   label: "雪花", icon: "❄️" },
     { id: "meteor", label: "星星", icon: "⭐" },
   ];
+  // 只保留 默认（无） 和 彗星
+  const CURSORS = [
+    { id: "none",  label: "默认", icon: "🖱️" },
+    { id: "comet", label: "彗星", icon: "☄️" },
+  ];
   
   const KEY_MODE = "theme";
   const KEY_PALETTE = "palette";
   const KEY_EFFECT = "effect";
   const KEY_OPACITY = "effect_opacity";
+  const KEY_CURSOR = "cursorStyle";
   const html = document.documentElement;
 
   const currentMode = () => (html.getAttribute("data-theme") === "dark" ? "dark" : "light");
   const currentPalette = () => html.getAttribute("data-palette") || "default";
   const currentEffect = () => localStorage.getItem(KEY_EFFECT) || "flower";
   const currentOpacity = () => localStorage.getItem(KEY_OPACITY) || "0.6";
+  const currentCursor = () => localStorage.getItem(KEY_CURSOR) || "comet";
 
   const syncUI = () => {
     const mode = currentMode();
     const palette = currentPalette();
     const effect = currentEffect();
+    const cursor = currentCursor();
     
     document.querySelectorAll("#theme-panel .mode-btn").forEach(b => {
       b.classList.toggle("is-active", b.dataset.mode === mode);
@@ -45,19 +51,12 @@
     document.querySelectorAll("#theme-panel .effect-btn").forEach(b => {
       b.classList.toggle("is-active", b.dataset.effect === effect);
     });
+    document.querySelectorAll("#theme-panel .cursor-btn").forEach(b => {
+      b.classList.toggle("is-active", b.dataset.cursor === cursor);
+    });
 
     const slider = document.getElementById("effect-opacity");
     if (slider) slider.value = currentOpacity();
-  };
-
-  // 判断并渲染图标（支持 FontAwesome 或 Emoji）
-  const renderIcon = (iconStr) => {
-    // 如果是 fa- 开头的，走 FontAwesome 渲染
-    if (iconStr.startsWith("fa-")) {
-      return `<i class="fas ${iconStr}"></i>`;
-    }
-    // 否则作为 Emoji / 文本渲染，并稍微放大字号以匹配视觉平衡
-    return `<span style="font-size: 1.15em; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));">${iconStr}</span>`;
   };
 
   const buildPanel = () => {
@@ -67,6 +66,7 @@
     const palette = currentPalette();
     const effect = currentEffect();
     const opacity = currentOpacity();
+    const cursor = currentCursor();
 
     const modeHtml = MODES.map(m => `
       <button class="mode-btn ${m === mode ? "is-active" : ""}" data-mode="${m}">
@@ -80,7 +80,13 @@
 
     const effectHtml = EFFECTS.map(e => `
       <button class="effect-btn ${e.id === effect ? "is-active" : ""}" data-effect="${e.id}" title="${e.label}">
-        ${renderIcon(e.icon)}
+        <span style="font-size: 1.15em; line-height: 1;">${e.icon}</span>
+      </button>`).join("");
+
+    // 渲染光标按钮（只有两个）
+    const cursorHtml = CURSORS.map(c => `
+      <button class="effect-btn cursor-btn ${c.id === cursor ? "is-active" : ""}" data-cursor="${c.id}" title="${c.label}">
+        <span style="font-size: 1.15em; line-height: 1;">${c.icon}</span>
       </button>`).join("");
 
     document.body.insertAdjacentHTML("beforeend", `
@@ -100,6 +106,9 @@
           <span>透明度</span>
           <input type="range" id="effect-opacity" min="0" max="1" step="0.1" value="${opacity}">
         </div>
+        <div class="panel-divider"></div>
+        <p class="panel-title">光标样式</p>
+        <div class="effect-grid" style="grid-template-columns: repeat(2, 1fr);">${cursorHtml}</div>
       </div>
     `);
 
@@ -132,9 +141,15 @@
         setTimeout(syncUI, 0); 
         return;
       }
-      const effBtn = e.target.closest(".effect-btn");
+      const effBtn = e.target.closest(".effect-btn:not(.cursor-btn)");
       if (effBtn) {
         if (window.__setEffect) window.__setEffect(effBtn.dataset.effect);
+        setTimeout(syncUI, 0);
+        return;
+      }
+      const curBtn = e.target.closest(".cursor-btn");
+      if (curBtn) {
+        if (window.__setCursorStyle) window.__setCursorStyle(curBtn.dataset.cursor);
         setTimeout(syncUI, 0);
       }
     });
