@@ -150,7 +150,6 @@ function renderSidebar(data) {
       const isCatActive = ACTIVE_CAT_KEY === cat.key;
       let subHtml = `
         <div class="sidebar-series-list">
-          <button class="sidebar-series-btn ${isCatActive && ACTIVE_SERIES_KEY === 'all' ? 'is-active' : ''}" data-cat="${cat.key}" data-series="all">全部</button>
           ${cat.children.map(sub => `
             <button class="sidebar-series-btn ${isCatActive && ACTIVE_SERIES_KEY === sub.name ? 'is-active' : ''}" data-cat="${cat.key}" data-series="${sub.name}">
               ${sub.name}
