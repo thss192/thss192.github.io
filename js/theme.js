@@ -9,13 +9,15 @@
     { id: "sunset",  label: "落日" },
     { id: "mono",    label: "极简" },
   ];
+  
+  // 特效按钮全部使用 Emoji
   const EFFECTS = [
-    { id: "none",   label: "关闭", icon: "fa-ban" },
-    { id: "star",   label: "星空", icon: "fa-star" },
-    { id: "heart",  label: "爱心", icon: "fa-heart" },
-    { id: "flower", label: "花朵", icon: "fa-fan" },
-    { id: "snow",   label: "雪花", icon: "fa-snowflake" },
-    { id: "meteor", label: "流星", icon: "fa-meteor" },
+    { id: "none",   label: "关闭", icon: "🚫" },
+    { id: "star",   label: "星空", icon: "✨" },
+    { id: "heart",  label: "爱心", icon: "💖" },
+    { id: "flower", label: "花朵", icon: "🌸" },
+    { id: "snow",   label: "雪花", icon: "❄️" },
+    { id: "meteor", label: "星星", icon: "⭐" },
   ];
   
   const KEY_MODE = "theme";
@@ -48,6 +50,16 @@
     if (slider) slider.value = currentOpacity();
   };
 
+  // 判断并渲染图标（支持 FontAwesome 或 Emoji）
+  const renderIcon = (iconStr) => {
+    // 如果是 fa- 开头的，走 FontAwesome 渲染
+    if (iconStr.startsWith("fa-")) {
+      return `<i class="fas ${iconStr}"></i>`;
+    }
+    // 否则作为 Emoji / 文本渲染，并稍微放大字号以匹配视觉平衡
+    return `<span style="font-size: 1.15em; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));">${iconStr}</span>`;
+  };
+
   const buildPanel = () => {
     if (document.getElementById("theme-fab")) return;
 
@@ -68,7 +80,7 @@
 
     const effectHtml = EFFECTS.map(e => `
       <button class="effect-btn ${e.id === effect ? "is-active" : ""}" data-effect="${e.id}" title="${e.label}">
-        <i class="fas ${e.icon}"></i>
+        ${renderIcon(e.icon)}
       </button>`).join("");
 
     document.body.insertAdjacentHTML("beforeend", `

@@ -1,4 +1,4 @@
-﻿// 极致性能版 Particle Effects (淡蓝雪花 + 豆豆眼空心五角星 + 统一速度)
+﻿// 极致性能版 Particle Effects (仅五角星使用预渲染)
 (function () {
   const canvas = document.createElement("canvas");
   canvas.id = "effects-canvas";
@@ -31,7 +31,75 @@
   window.addEventListener("resize", resize);
   resize();
 
-  // 算法生成雪花
+  // ==========================================
+  // 仅针对五角星（meteor）的预渲染模板
+  // ==========================================
+  const starCanvas = document.createElement("canvas");
+  starCanvas.width = 100;
+  starCanvas.height = 100;
+  const starCtx = starCanvas.getContext("2d");
+  
+  (function drawStarTemplate() {
+    const cx = 50, cy = 50;
+    const R = 45;          // 外顶点半径
+    const r = 22;          // 内凹点半径
+    const points = 5;
+    
+    // 1. 星体轮廓
+    starCtx.beginPath();
+    for (let i = 0; i < points * 2; i++) {
+      const radius = i % 2 === 0 ? R : r;
+      const angle = (i * Math.PI) / points - Math.PI / 2;
+      const x = cx + Math.cos(angle) * radius;
+      const y = cy + Math.sin(angle) * radius;
+      if (i === 0) starCtx.moveTo(x, y);
+      else starCtx.lineTo(x, y);
+    }
+    starCtx.closePath();
+    
+    // 2. 模拟发光（代替高消耗的 shadowBlur）
+    const glowGrad = starCtx.createRadialGradient(cx, cy, 10, cx, cy, 50);
+    glowGrad.addColorStop(0, "rgba(255, 225, 100, 0.8)");
+    glowGrad.addColorStop(1, "rgba(255, 225, 100, 0)");
+    starCtx.fillStyle = glowGrad;
+    starCtx.fill();
+    
+    // 3. 星星本体填充与描边
+    starCtx.fillStyle = "rgba(255, 245, 150, 1)";
+    starCtx.fill();
+    starCtx.lineWidth = 3;
+    starCtx.strokeStyle = "rgba(255, 195, 0, 1)";
+    starCtx.lineJoin = "round";
+    starCtx.stroke();
+
+    // 4. 豆豆眼
+    const eyeY = 46;
+    const eyeSpacing = 10;
+    const eyeRadius = 5;
+
+    starCtx.fillStyle = "#333";
+    starCtx.beginPath();
+    starCtx.arc(cx - eyeSpacing, eyeY, eyeRadius, 0, Math.PI * 2);
+    starCtx.arc(cx + eyeSpacing, eyeY, eyeRadius, 0, Math.PI * 2);
+    starCtx.fill();
+
+    // 5. 眼神高光
+    starCtx.fillStyle = "#fff";
+    starCtx.beginPath();
+    starCtx.arc(cx - eyeSpacing + 1.5, eyeY - 1.5, 1.8, 0, Math.PI * 2);
+    starCtx.arc(cx + eyeSpacing + 1.5, eyeY - 1.5, 1.8, 0, Math.PI * 2);
+    starCtx.fill();
+
+    // 6. 腮红
+    starCtx.fillStyle = "rgba(255, 100, 150, 0.6)";
+    starCtx.beginPath();
+    starCtx.ellipse(cx - eyeSpacing * 1.6, eyeY + 6, 3.5, 2, 0, 0, Math.PI * 2);
+    starCtx.ellipse(cx + eyeSpacing * 1.6, eyeY + 6, 3.5, 2, 0, 0, Math.PI * 2);
+    starCtx.fill();
+  })();
+  // ==========================================
+
+  // 算法生成雪花（保持实时绘制）
   function drawSnowflake(ctx, size, alpha) {
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -65,30 +133,6 @@
     ctx.stroke();
   }
 
-  // 算法生成带豆豆眼的空心五角星
-  function drawEyeStar(ctx, size, alpha) {
-    ctx.beginPath();
-    for (let i = 0; i < 5; i++) {
-      ctx.lineTo(Math.cos((18 + i * 72) / 180 * Math.PI) * size, -Math.sin((18 + i * 72) / 180 * Math.PI) * size);
-      ctx.lineTo(Math.cos((54 + i * 72) / 180 * Math.PI) * size * 0.45, -Math.sin((54 + i * 72) / 180 * Math.PI) * size * 0.45);
-    }
-    ctx.closePath();
-    
-    // 1. 画星星外框 (金黄色)
-    ctx.strokeStyle = `rgba(255, 215, 0, ${alpha})`; 
-    ctx.lineWidth = 2;
-    ctx.lineJoin = "round";
-    ctx.stroke();
-
-    // 2. 画豆豆眼
-    ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
-    ctx.beginPath();
-    // 左眼和右眼
-    ctx.arc(-size * 0.18, -size * 0.05, size * 0.12, 0, Math.PI * 2); 
-    ctx.arc(size * 0.18, -size * 0.05, size * 0.12, 0, Math.PI * 2);  
-    ctx.fill();
-  }
-
   class Particle {
     constructor(type, isClick) {
       this.type = type;
@@ -97,8 +141,9 @@
       this.y = isClick ? isClick.y : -30; 
       
       this.size = isClick ? Math.random() * 8 + 6 : Math.random() * 6 + 4;
-      // 星星尺寸稍微调小一点，更有精致感
-      if (type === "meteor") this.size = Math.random() * 4 + 8; 
+      
+      // 五角星（meteor）尺寸调大，因为贴图好看
+      if (type === "meteor") this.size = Math.random() * 6 + 12; 
       if (type === "snow") this.size = Math.random() * 5 + 4;
 
       if (isClick) {
@@ -111,7 +156,6 @@
         this.birth = performance.now();
       } else {
         if (type === "meteor") {
-          // 速度完全对齐花瓣的慢速度
           this.vx = (Math.random() - 0.5) * 1.2;
           this.vy = Math.random() * 1.5 + 1; 
           this.decay = 0.002;
@@ -127,7 +171,7 @@
       }
       this.life = 1;
       this.rotation = Math.random() * Math.PI * 2;
-      this.rotSpeed = (Math.random() - 0.5) * 0.03;
+      this.rotSpeed = (Math.random() - 0.5) * 0.04;
     }
 
     update(now) {
@@ -157,6 +201,7 @@
       ctx.rotate(this.rotation);
 
       if (this.type === "star") {
+        // 普通十字星：实时绘制
         ctx.shadowBlur = 10;
         ctx.shadowColor = `rgba(${r}, ${g}, ${b}, ${alpha * 0.8})`;
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
@@ -171,12 +216,9 @@
         ctx.fill();
         
         ctx.shadowBlur = 0;
-        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.6})`;
-        ctx.beginPath();
-        ctx.arc(0, 0, s * 0.2, 0, Math.PI * 2);
-        ctx.fill();
 
       } else if (this.type === "heart") {
+        // 爱心：实时绘制
         ctx.fillStyle = `rgba(255, 77, 109, ${alpha})`;
         ctx.beginPath();
         ctx.moveTo(0, this.size * 0.3);
@@ -186,6 +228,7 @@
         ctx.bezierCurveTo(this.size, -this.size * 0.2, 0, 0, 0, this.size * 0.3);
         ctx.fill();
       } else if (this.type === "flower") {
+        // 花朵：实时绘制
         ctx.fillStyle = `rgba(255, 183, 197, ${alpha})`;
         ctx.beginPath();
         const petals = 5;
@@ -197,9 +240,13 @@
         }
         ctx.fill();
       } else if (this.type === "snow") {
+        // 雪花：实时绘制
         drawSnowflake(ctx, this.size, alpha);
       } else if (this.type === "meteor") {
-        drawEyeStar(ctx, this.size, alpha);
+        // 五角星：直接贴图（预渲染），性能极佳
+        ctx.globalAlpha = alpha;
+        const s = this.size * 2.2; 
+        ctx.drawImage(starCanvas, -s/2, -s/2, s, s);
       }
       ctx.restore();
     }
