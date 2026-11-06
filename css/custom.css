@@ -1,5 +1,5 @@
 ﻿/* ==========================================================================
-   My Blog - Global Styles (Base, Navbar, Sky, Common Cards)
+   My Blog - Global Styles (Base, Navbar, Common Cards)
    ========================================================================== */
 
 /* 1. 全局变量与基础 */
@@ -37,21 +37,6 @@ body {
   transition: background-color .25s ease, color .25s ease;
 }
 [data-theme="dark"] body { background-color: var(--bg-dark); }
-
-body.sky-tinted {
-  background-image: linear-gradient(to bottom, rgba(135, 206, 235, 0.15) 0%, transparent 100%) !important;
-  background-attachment: fixed !important;
-}
-body.sky-tinted.sky-night {
-  background-image: linear-gradient(to bottom, rgba(15, 32, 39, 0.15) 0%, transparent 100%) !important;
-  background-attachment: fixed !important;
-}
-[data-theme="dark"] body.sky-tinted {
-  background-image: linear-gradient(to bottom, rgba(135, 206, 235, 0.05) 0%, transparent 100%) !important;
-}
-[data-theme="dark"] body.sky-tinted.sky-night {
-  background-image: none !important;
-}
 
 /* 2. 导航栏 */
 #site-navbar .navbar-brand .navbar-item strong {
@@ -368,47 +353,7 @@ body.sky-tinted.sky-night {
 [data-theme="dark"] .links-page .button.is-light { background-color: var(--border-dark) !important; color: #ddd !important; border: 1px solid #444; }
 
 /* ==========================================================================
-   8. 动态天空模块
-   ========================================================================== */
-.hero-sky { position: relative; overflow: hidden; min-height: 180px; background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%) !important; transition: background 1s ease; }
-.hero-sky #sky-stars { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1s ease; background-image: radial-gradient(1px 1px at 10% 20%, #fff 1px, transparent 0), radial-gradient(1.5px 1.5px at 30% 50%, #fff 1px, transparent 0), radial-gradient(1px 1px at 60% 10%, #fff 1px, transparent 0), radial-gradient(2px 2px at 80% 70%, #fff 1px, transparent 0), radial-gradient(1px 1px at 40% 80%, #fff 1px, transparent 0), radial-gradient(1.5px 1.5px at 90% 40%, #fff 1px, transparent 0); background-size: 200px 200px; animation: starTwinkle 4s infinite alternate; }
-@keyframes starTwinkle { 0% { opacity: 0.8; } 100% { opacity: 1; } }
-.hero-sky .hero-body { padding-top: 3.5rem !important; padding-bottom: 2rem !important; }
-
-.hero-sky .time-control { position: absolute; top: 0.5rem; right: 1rem; z-index: 10; display: flex; align-items: center; gap: 1.5rem; pointer-events: none; }
-.hero-sky .time-info { display: flex; align-items: center; gap: 0.5rem; pointer-events: auto; }
-.hero-sky .time-text { font-family: var(--bulma-family-code); font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: 1px; text-shadow: 0 1px 4px rgba(0,0,0,0.4); font-variant-numeric: tabular-nums; }
-.hero-sky .date-text { font-size: 0.9rem; color: rgba(255, 255, 255, 0.9); text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
-.hero-sky .time-divider { color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
-.hero-sky .time-btn { pointer-events: auto; background: transparent; border: none; padding: 0; color: rgba(255, 255, 255, 0.8); font-size: 0.95rem; cursor: pointer; text-shadow: 0 1px 4px rgba(0,0,0,0.4); transition: color 0.2s ease, text-shadow 0.2s ease; }
-.hero-sky .time-btn:hover { color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.6), 0 0 8px rgba(255,255,255,0.4); }
-[data-theme="dark"] .hero-sky .time-text, [data-theme="dark"] .hero-sky .date-text, [data-theme="dark"] .hero-sky .time-btn { color: #e2e8f0; }
-@media screen and (max-width: 768px) {
-  .hero-sky .time-control { top: 0.2rem; right: 0.5rem; gap: 1rem; }
-  .hero-sky .time-text { font-size: 1rem; }
-  .hero-sky .date-text { display: none; }
-}
-
-#sky-celestial { transition: opacity 0.4s ease, transform 0.4s ease !important; }
-#sky-celestial.sun-hidden { opacity: 0 !important; transform: translateY(40px) scale(0.5) !important; pointer-events: none; transition-delay: 0s !important; }
-#sky-moon {
-  position: absolute; width: 80px; height: 80px; top: 25%; right: 20%; z-index: 1;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M 50 10 A 40 40 0 1 1 10 50 A 30 30 0 1 0 50 10 Z' fill='%23f0f0f0'/></svg>") !important;
-  background-size: contain; background-repeat: no-repeat; background-position: center; filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
-  opacity: 0; transform: translateY(40px) scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease !important; pointer-events: none; transition-delay: 0s !important;
-}
-[data-theme="dark"] #sky-moon { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M 50 10 A 40 40 0 1 1 10 50 A 30 30 0 1 0 50 10 Z' fill='%23b0b0b0'/></svg>") !important; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2)); }
-#sky-moon.moon-visible { opacity: 1 !important; transform: translateY(0) scale(1) !important; transition-delay: 0.3s !important; }
-.no-anim-sky #sky-celestial, .no-anim-sky #sky-moon { transition: none !important; }
-
-.hero-sky .title, .hero-sky #page-title, .hero-sky #hero-title, .hero-sky #about-page-title, .hero-sky .subtitle, .hero-sky #page-subtitle, .hero-sky #hero-subtitle { transition: color 0.5s ease, text-shadow 0.5s ease !important; }
-.hero-sky:not(.is-dark-sky) .title, .hero-sky:not(.is-dark-sky) #page-title, .hero-sky:not(.is-dark-sky) #hero-title, .hero-sky:not(.is-dark-sky) #about-page-title { color: var(--bulma-text-strong) !important; text-shadow: 0 2px 10px rgba(255, 255, 255, 0.4) !important; }
-.hero-sky:not(.is-dark-sky) .subtitle, .hero-sky:not(.is-dark-sky) #page-subtitle, .hero-sky:not(.is-dark-sky) #hero-subtitle { color: var(--bulma-text) !important; text-shadow: 0 1px 5px rgba(255, 255, 255, 0.3) !important; }
-.hero-sky.is-dark-sky .title, .hero-sky.is-dark-sky #page-title, .hero-sky.is-dark-sky #hero-title, .hero-sky.is-dark-sky #about-page-title { color: #ffffff !important; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5) !important; }
-.hero-sky.is-dark-sky .subtitle, .hero-sky.is-dark-sky #page-subtitle, .hero-sky.is-dark-sky #hero-subtitle { color: rgba(255, 255, 255, 0.85) !important; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4) !important; }
-
-/* ==========================================================================
-   9. 响应式
+   8. 响应式
    ========================================================================== */
 @media screen and (max-width: 1023px) {
   .navbar-menu.is-active { background-color: var(--bulma-scheme-main) !important; border-bottom: 1px solid var(--bulma-border-weak); z-index: 1000; }
@@ -420,15 +365,14 @@ body.sky-tinted.sky-night {
 }
 
 /* ==========================================================================
-   10. 项目页 & 友链页卡片美化
+   9. 项目页 & 友链页卡片美化
    ========================================================================== */
 
-/* 统一卡片基础样式（加入径向渐变底色） */
+/* 统一卡片基础样式 */
 #project-list .card,
 #link-list .card {
   position: relative;
   overflow: hidden;
-  /* 【核心优化】亮色模式下，右上角微微透出一点主题色 */
   background: radial-gradient(circle at 100% 0%, var(--bulma-primary-soft) 0%, transparent 40%), 
               linear-gradient(135deg, var(--bulma-scheme-main), var(--bulma-scheme-main-bis));
   border: 1.5px solid var(--bulma-border);
@@ -439,7 +383,6 @@ body.sky-tinted.sky-night {
               border-color 0.3s ease;
 }
 
-/* 悬停时上浮、加阴影、变主题色边框 */
 #project-list .card:hover,
 #link-list .card:hover {
   transform: translateY(-5px);
@@ -447,7 +390,6 @@ body.sky-tinted.sky-night {
   border-color: var(--bulma-primary);
 }
 
-/* 暗色模式下的背景与边框 */
 [data-theme="dark"] #project-list .card,
 [data-theme="dark"] #link-list .card {
   background: radial-gradient(circle at 100% 0%, rgba(0, 200, 150, 0.08) 0%, transparent 45%), 
@@ -460,36 +402,27 @@ body.sky-tinted.sky-night {
   border-color: var(--bulma-primary);
 }
 
-/* ================= 卡片花纹：散落的星光 ================= */
+/* 卡片花纹 */
 #project-list .card::before,
 #link-list .card::before {
   content: ""; position: absolute; top: -15px; right: -15px; width: 90px; height: 90px;
-  pointer-events: none; color: var(--bulma-primary); 
-  
-  /* 【核心优化】亮色模式下透明度从 0.08 提高到 0.15 */
-  opacity: 0.15; 
-  
-  background-color: currentColor;
+  pointer-events: none; color: var(--bulma-primary); opacity: 0.15; background-color: currentColor;
   -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><path d='M30 10 Q 32 28 50 30 Q 32 32 30 50 Q 28 32 10 30 Q 28 28 30 10 Z'/><path d='M75 45 Q 76 59 90 60 Q 76 61 75 75 Q 74 61 60 60 Q 74 59 75 45 Z' opacity='0.7'/><path d='M40 70 Q 41 79 50 80 Q 41 81 40 90 Q 39 81 30 80 Q 39 79 40 70 Z' opacity='0.4'/></g></svg>");
           mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='black'><path d='M30 10 Q 32 28 50 30 Q 32 32 30 50 Q 28 32 10 30 Q 28 28 30 10 Z'/><path d='M75 45 Q 76 59 90 60 Q 76 61 75 75 Q 74 61 60 60 Q 74 59 75 45 Z' opacity='0.7'/><path d='M40 70 Q 41 79 50 80 Q 41 81 40 90 Q 39 81 30 80 Q 39 79 40 70 Z' opacity='0.4'/></g></svg>");
   -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-  transform: rotate(0deg);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transform: rotate(0deg); transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-/* 悬停时花纹变得更亮并微微旋转 */
 #project-list .card:hover::before,
 #link-list .card:hover::before {
   opacity: 0.25; transform: rotate(15deg) scale(1.1);
 }
 
-/* 暗色模式下的花纹透明度适配 */
 [data-theme="dark"] #project-list .card::before,
 [data-theme="dark"] #link-list .card::before { opacity: 0.12; }
 [data-theme="dark"] #project-list .card:hover::before,
 [data-theme="dark"] #link-list .card:hover::before { opacity: 0.22; }
 
-/* 保证内容在星光花纹之上 */
 #project-list .card-content,
 #project-list .card-footer,
 #link-list .card-content,
@@ -498,29 +431,15 @@ body.sky-tinted.sky-night {
   z-index: 1;
 }
 
-/* ================= 内部细节优化 ================= */
-
-/* 项目卡片底部的操作栏（按钮） */
-#project-list .card-footer {
-  border-top: 1px dashed var(--bulma-border-weak);
-}
-[data-theme="dark"] #project-list .card-footer {
-  border-top-color: var(--border-dark);
-}
+#project-list .card-footer { border-top: 1px dashed var(--bulma-border-weak); }
+[data-theme="dark"] #project-list .card-footer { border-top-color: var(--border-dark); }
 
 #project-list .card-footer-item {
-  font-weight: 600;
-  color: var(--bulma-primary);
-  transition: background-color 0.2s ease;
+  font-weight: 600; color: var(--bulma-primary); transition: background-color 0.2s ease;
 }
-#project-list .card-footer-item:hover {
-  background-color: var(--bulma-primary-soft);
-}
+#project-list .card-footer-item:hover { background-color: var(--bulma-primary-soft); }
 
-/* 友链卡片的“访问网站”按钮 */
-#link-list .card .button.is-light {
-  transition: all 0.2s ease;
-}
+#link-list .card .button.is-light { transition: all 0.2s ease; }
 #link-list .card:hover .button.is-light {
   background-color: var(--bulma-primary-soft) !important;
   color: var(--bulma-primary) !important;
