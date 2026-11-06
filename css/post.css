@@ -2,13 +2,12 @@
    Post Detail Page Styles
    ========================================================================== */
 
-/* 1. 文章正文排版优化 */
 .post-content { font-size: 1.05rem; line-height: 1.8; color: var(--bulma-text); }
 #post-body > h1:first-child { display: none !important; }
 :not(pre) > code { background-color: rgba(175, 184, 193, 0.2) !important; color: #eb5757 !important; padding: 0.2em 0.4em !important; border-radius: 4px; font-size: 0.85em; }
 [data-theme="dark"] :not(pre) > code { background-color: rgba(110, 118, 129, 0.4) !important; color: #ff7b72 !important; }
 
-/* 2. 代码块专属美化 */
+/* 代码块专属美化 */
 .code-wrapper { background-color: #f6f8fa; border: 1px solid #d0d7de; border-radius: var(--bulma-radius-large); margin-bottom: 1.5rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); }
 [data-theme="dark"] .code-wrapper { background-color: #0d0d0d; border-color: #333; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); }
 .code-header { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 1rem; background-color: #eef1f4; border-bottom: 1px solid #d0d7de; }
@@ -22,7 +21,7 @@
 .code-wrapper pre { margin: 0 !important; padding: 1rem 1.2rem !important; background-color: transparent !important; border: none !important; border-radius: 0 !important; }
 .code-wrapper pre code { background-color: transparent !important; padding: 0 !important; box-shadow: none !important; font-size: 0.9em !important; line-height: 1.6 !important; }
 
-/* 3. 右侧目录 (TOC) */
+/* 目录 (TOC) */
 .toc-sticky { position: sticky; top: 5rem; max-height: calc(100vh - 6rem); overflow-y: auto; }
 #toc-list { border-left: 2px solid var(--bulma-border-weak); }
 [data-theme="dark"] #toc-list { border-left-color: #333; }
@@ -34,30 +33,17 @@
 #toc-list .toc-h2 { padding-left: 1rem; }
 #toc-list .toc-h3 { padding-left: 2rem; font-size: 0.8rem; }
 
-/* 4. 阅读进度条 */
+/* 阅读进度条 */
 #reading-progress { position: fixed; top: 3.25rem; left: 0; height: 3px; background-color: var(--bulma-primary); z-index: 1000; width: 0%; transition: width 0.1s ease-out; }
 [data-theme="dark"] #post-header .title { color: #e5e7eb !important; }
 [data-theme="dark"] .title a, [data-theme="dark"] h1 a, [data-theme="dark"] h2 a { color: inherit; }
 
-/* 5. 文章评论区 */
+/* 评论区 */
 #giscus-comments { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--bulma-border-weak); border-radius: var(--bulma-radius-large); padding: 1.5rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); transition: all 0.3s ease; }
 [data-theme="dark"] #giscus-comments { background: rgba(255, 255, 255, 0.02); border-color: rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
 #giscus-comments iframe.giscus-frame { width: 100% !important; border: none !important; background: transparent !important; color-scheme: none !important; }
 
-/* ==========================================================================
-   修复小屏 / 隐藏目录时的栅格宽度
-   ========================================================================== */
-
-/* 当屏幕宽度小于 1024px 时（此时目录会被隐藏），让文章占满全宽 */
-@media screen and (max-width: 1023px) {
-  /* 强制覆盖 Bulma 的 .is-9 宽度 */
-  .column.is-9 {
-    width: 100% !important;
-    flex: none !important;
-  }
-}
-
-/* ===== 导航栏“返回目录”按钮专属样式 ===== */
+/* 导航栏“返回目录”按钮 */
 .nav-return-btn {
   background-color: var(--bulma-primary-soft) !important;
   color: var(--bulma-primary) !important;
@@ -81,155 +67,53 @@
   color: var(--bg-dark) !important;
 }
 
-/* ==========================================================================
-   窄屏导航栏布局优化
-   ========================================================================== */
+/* 小屏修复栅格宽度 */
 @media screen and (max-width: 1023px) {
-  /* 让导航栏左侧（Brand 区域）占满剩余空间，防止汉堡菜单被挤压 */
-  #site-navbar .navbar-brand {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-  }
-  
-  #site-navbar .navbar-brand .navbar-item strong {
-    font-size: 1rem; /* 窄屏 Logo 稍微变小一点 */
-  }
-
-  /* 隐藏窄屏下 Navbar brand 里的返回按钮的 padding，使其更紧凑 */
-  #site-navbar .navbar-brand .nav-return-btn {
-    margin: 0;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
+  .column.is-9 { width: 100% !important; flex: none !important; }
 }
 
-/* ==========================================================================
-   标签悬浮面板样式 (新增)
-   ========================================================================== */
+/* 窄屏导航栏布局优化 */
+@media screen and (max-width: 1023px) {
+  #site-navbar .navbar-brand {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+  }
+  #site-navbar .navbar-brand .navbar-item strong { font-size: 1rem; }
+  #site-navbar .navbar-brand .nav-return-btn { margin: 0; padding-left: 0.5rem; padding-right: 0.5rem; }
+}
+
+/* 标签悬浮面板 */
 .tag-drawer-panel {
-  position: fixed;
-  top: 0;
-  right: -320px; /* 初始隐藏在右侧 */
-  width: 300px;
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
+  position: fixed; top: 0; right: -320px; width: 300px; height: 100vh;
+  background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1); z-index: 10000; display: flex; flex-direction: column;
   transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+[data-theme="dark"] .tag-drawer-panel { background: rgba(18, 18, 18, 0.85); box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5); }
+.tag-drawer-panel.is-open { right: 0; }
 
-[data-theme="dark"] .tag-drawer-panel {
-  background: rgba(18, 18, 18, 0.85);
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
-}
+.drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--bulma-border-weak); }
+[data-theme="dark"] .drawer-header { border-bottom-color: var(--border-dark); }
 
-.tag-drawer-panel.is-open {
-  right: 0;
-}
-
-.drawer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--bulma-border-weak);
-}
-
-[data-theme="dark"] .drawer-header {
-  border-bottom-color: var(--border-dark);
-}
-
-.drawer-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+.drawer-body { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
 
 .drawer-item {
-  display: block;
-  padding: 1rem;
-  background: var(--bulma-scheme-main);
-  border: 1px solid var(--bulma-border-weak);
-  border-radius: var(--bulma-radius-large);
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.2s ease;
+  display: block; padding: 1rem; background: var(--bulma-scheme-main);
+  border: 1px solid var(--bulma-border-weak); border-radius: var(--bulma-radius-large);
+  text-decoration: none; color: inherit; transition: all 0.2s ease;
 }
+.drawer-item:hover { background: var(--bulma-primary-soft); border-color: var(--bulma-primary); transform: translateX(-4px); }
+[data-theme="dark"] .drawer-item { background: var(--bg-dark-card); border-color: var(--border-dark); }
+[data-theme="dark"] .drawer-item:hover { background: rgba(0, 200, 150, 0.1); border-color: var(--bulma-primary); }
 
-.drawer-item:hover {
-  background: var(--bulma-primary-soft);
-  border-color: var(--bulma-primary);
-  transform: translateX(-4px);
-}
+.drawer-item-title { font-weight: 700; font-size: 0.95rem; color: var(--bulma-text-strong); margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.drawer-item-date { font-size: 0.75rem; color: var(--bulma-text-light); font-family: var(--bulma-family-code); }
 
-[data-theme="dark"] .drawer-item {
-  background: var(--bg-dark-card);
-  border-color: var(--border-dark);
-}
-
-[data-theme="dark"] .drawer-item:hover {
-  background: rgba(0, 200, 150, 0.1);
-  border-color: var(--bulma-primary);
-}
-
-.drawer-item-title {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--bulma-text-strong);
-  margin-bottom: 0.25rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.drawer-item-date {
-  font-size: 0.75rem;
-  color: var(--bulma-text-light);
-  font-family: var(--bulma-family-code);
-}
-
-/* 遮罩层 */
 #tag-drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(2px);
-  z-index: 9999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(2px);
+  z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
 }
+#tag-drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
 
-#tag-drawer-backdrop.is-open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* ==========================================================================
-   标签悬浮面板 - 当前文章高亮置顶
-   ========================================================================== */
-.drawer-item.is-current {
-  background: var(--bulma-primary-soft) !important;
-  border-color: var(--bulma-primary) !important;
-  border-left: 4px solid var(--bulma-primary) !important;
-  cursor: default;
-}
-
-.drawer-item.is-current .drawer-item-title {
-  color: var(--bulma-primary) !important;
-}
-
-[data-theme="dark"] .drawer-item.is-current {
-  background: rgba(0, 200, 150, 0.1) !important;
-  border-color: var(--bulma-primary) !important;
-}
+.drawer-item.is-current { background: var(--bulma-primary-soft) !important; border-color: var(--bulma-primary) !important; border-left: 4px solid var(--bulma-primary) !important; cursor: default; }
+.drawer-item.is-current .drawer-item-title { color: var(--bulma-primary) !important; }
+[data-theme="dark"] .drawer-item.is-current { background: rgba(0, 200, 150, 0.1) !important; border-color: var(--bulma-primary) !important; }

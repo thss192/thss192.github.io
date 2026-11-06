@@ -1,271 +1,54 @@
 ﻿/* ==========================================================================
    Theme Switcher - 6 套配色方案
-   用法：<html data-theme="dark" data-palette="forest">
    ========================================================================== */
 
-/* ---------- 1) 预设调色板（浅色 / 深色 共享色调） ---------- */
 :root[data-palette="forest"] { --bulma-primary-h: 145; --bulma-primary-s: 63%; --bulma-primary-l: 42%; --bulma-link-h: 145; --bulma-link-s: 63%; --bulma-link-l: 42%; }
 :root[data-palette="sakura"] { --bulma-primary-h: 340; --bulma-primary-s: 82%; --bulma-primary-l: 62%; --bulma-link-h: 340; --bulma-link-s: 82%; --bulma-link-l: 62%; }
 :root[data-palette="ocean"] { --bulma-primary-h: 200; --bulma-primary-s: 90%; --bulma-primary-l: 48%; --bulma-link-h: 200; --bulma-link-s: 90%; --bulma-link-l: 48%; }
 :root[data-palette="sunset"] { --bulma-primary-h: 25;  --bulma-primary-s: 95%; --bulma-primary-l: 55%; --bulma-link-h: 25;  --bulma-link-s: 95%; --bulma-link-l: 55%; }
 
-/* ---------- 2) 深色下的卡片/背景微调（让不同配色都协调） ---------- */
 :root[data-palette="forest"][data-theme="dark"] { --bg-dark: #0f1a14; --bg-dark-card: #15241b; --bg-dark-card-hover: #1c2e22; }
 :root[data-palette="sakura"][data-theme="dark"] { --bg-dark: #1a1216; --bg-dark-card: #241820; --bg-dark-card-hover: #2e1f2a; }
 :root[data-palette="ocean"][data-theme="dark"]  { --bg-dark: #0f141a; --bg-dark-card: #141c24; --bg-dark-card-hover: #1a2430; }
 :root[data-palette="sunset"][data-theme="dark"] { --bg-dark: #1a140f; --bg-dark-card: #241b14; --bg-dark-card-hover: #2e241a; }
 
-/* ---------- 3) 左下角主题按钮（浮动） ---------- */
-#theme-fab {
-  position: fixed;
-  left: 1.25rem;
-  bottom: 1.25rem;
-  z-index: 999;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.15rem;
-  color: var(--bulma-primary-invert);
-  background: var(--bulma-primary);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  transition: transform .2s ease, box-shadow .2s ease;
-}
+#theme-fab { position: fixed; left: 1.25rem; bottom: 1.25rem; z-index: 999; width: 3rem; height: 3rem; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; color: var(--bulma-primary-invert); background: var(--bulma-primary); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); transition: transform .2s ease, box-shadow .2s ease; }
 #theme-fab:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); }
 #theme-fab:active { transform: scale(0.97); }
 
-/* ---------- 4) 弹出的主题面板 ---------- */
-#theme-panel {
-  position: fixed;
-  left: 1.25rem;
-  bottom: 5rem;
-  z-index: 998;
-  background: var(--bulma-scheme-main);
-  border: 1px solid var(--bulma-border-weak);
-  border-radius: var(--bulma-radius-large);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
-  padding: 1rem;
-  width: 260px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: all .2s ease;
-}
-[data-theme="dark"] #theme-panel {
-  background: var(--bg-dark-card);
-  border-color: var(--border-dark);
-}
+#theme-panel { position: fixed; left: 1.25rem; bottom: 5rem; z-index: 998; background: var(--bulma-scheme-main); border: 1px solid var(--bulma-border-weak); border-radius: var(--bulma-radius-large); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16); padding: 1rem; width: 260px; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all .2s ease; }
+[data-theme="dark"] #theme-panel { background: var(--bg-dark-card); border-color: var(--border-dark); }
 #theme-panel.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
-#theme-panel .panel-title {
-  font-size: .75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--bulma-text-light);
-  margin-bottom: .5rem;
-}
+#theme-panel .panel-title { font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--bulma-text-light); margin-bottom: .5rem; }
 #theme-panel .panel-divider { height: 1px; background: var(--bulma-border-weak); margin: .75rem 0; }
 
-/* ---------- 5) 模式按钮（亮 / 暗） ---------- */
 .mode-row { display: flex; gap: .5rem; }
-.mode-btn {
-  flex: 1;
-  padding: .55rem 0;
-  border-radius: var(--bulma-radius);
-  border: 1px solid var(--bulma-border-weak);
-  background: var(--bulma-scheme-main-bis);
-  color: var(--bulma-text);
-  cursor: pointer;
-  font-size: .8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: .35rem;
-  transition: all .15s ease;
-}
+.mode-btn { flex: 1; padding: .55rem 0; border-radius: var(--bulma-radius); border: 1px solid var(--bulma-border-weak); background: var(--bulma-scheme-main-bis); color: var(--bulma-text); cursor: pointer; font-size: .8rem; display: flex; align-items: center; justify-content: center; gap: .35rem; transition: all .15s ease; }
 .mode-btn:hover { border-color: var(--bulma-primary); color: var(--bulma-primary); }
-.mode-btn.is-active {
-  background: var(--bulma-primary);
-  color: var(--bulma-primary-invert);
-  border-color: var(--bulma-primary);
-  font-weight: 600;
-}
 [data-theme="dark"] .mode-btn { background: var(--bg-dark-card-hover); border-color: var(--border-dark); color: #ccc; }
+#theme-panel .mode-btn.is-active { background-color: var(--bulma-primary) !important; color: var(--bulma-primary-invert) !important; border: 2px solid var(--bulma-primary) !important; font-weight: 700 !important; }
 
-/* ---------- 6) 配色按钮（六种风格） ---------- */
 .palette-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
-.palette-btn {
-  height: 2.6rem;
-  border-radius: var(--bulma-radius);
-  border: 2px solid transparent;
-  cursor: pointer;
-  position: relative;
-  transition: transform .15s ease, border-color .15s ease;
-}
+.palette-btn { height: 2.6rem; border-radius: var(--bulma-radius); border: 2px solid transparent; cursor: pointer; position: relative; transition: all .15s ease; }
 .palette-btn:hover { transform: translateY(-2px); }
-.palette-btn.is-active { border-color: var(--bulma-text-strong); box-shadow: 0 0 0 3px var(--bulma-scheme-main); }
-.palette-btn::after {
-  content: attr(data-label);
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .7rem;
-  font-weight: 600;
-  color: rgba(0,0,0,.65);
-  text-shadow: 0 1px 0 rgba(255,255,255,.4);
-}
+#theme-panel .palette-btn.is-active { border: 3px solid #ffffff !important; box-shadow: 0 0 0 2px #000000, 0 0 10px rgba(0,0,0,0.5) !important; transform: scale(1.05) !important; z-index: 1; }
+.palette-btn::after { content: attr(data-label); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 600; color: rgba(0,0,0,.65); text-shadow: 0 1px 0 rgba(255,255,255,.4); }
 [data-theme="dark"] .palette-btn::after { color: rgba(255,255,255,.85); text-shadow: 0 1px 0 rgba(0,0,0,.4); }
-
-/* 六种预览色块 */
 .palette-btn[data-palette="default"] { background: linear-gradient(135deg,#00d1b2,#42b883); }
-.palette-btn:root[data-palette="forest"] { background: linear-gradient(135deg,#3f8f5c,#a3d977); }
-.palette-btn:root[data-palette="sakura"] { background: linear-gradient(135deg,#f78fb3,#ffd1dc); }
-.palette-btn:root[data-palette="ocean"] { background: linear-gradient(135deg,#2196f3,#4fc3f7); }
-.palette-btn:root[data-palette="sunset"] { background: linear-gradient(135deg,#ff7043,#ffb74d); }
+.palette-btn[data-palette="forest"]  { background: linear-gradient(135deg,#3f8f5c,#a3d977); }
+.palette-btn[data-palette="sakura"]  { background: linear-gradient(135deg,#f78fb3,#ffd1dc); }
+.palette-btn[data-palette="ocean"]   { background: linear-gradient(135deg,#2196f3,#4fc3f7); }
+.palette-btn[data-palette="sunset"]  { background: linear-gradient(135deg,#ff7043,#ffb74d); }
 .palette-btn[data-palette="mono"]    { background: linear-gradient(135deg,#4b5563,#d1d5db); }
 
-/* ===== 修复原生深色导航栏 ===== */
-[data-theme="dark"] .navbar.is-fixed-top {
-  background-color: rgba(18, 18, 18, 0.75) !important;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
-}
-
-/* ===== 修复深色模式下的浅色横幅（Hero） ===== */
-[data-theme="dark"] .hero.is-light {
-  background-color: var(--bg-dark) !important;
-  border-bottom: 1px solid var(--border-dark);
-  color: var(--bulma-text-strong);
-}
-[data-theme="dark"] .hero.is-light .title {
-  color: #f3f4f6 !important;
-}
-[data-theme="dark"] .hero.is-light .subtitle {
-  color: var(--text-dark-muted) !important;
-}
-
-/* ===== 强制强化面板按钮的选中状态 ===== */
-#theme-panel .mode-btn.is-active {
-  background-color: var(--bulma-primary) !important;
-  color: var(--bulma-primary-invert) !important;
-  border: 2px solid var(--bulma-primary) !important;
-  font-weight: 700 !important;
-}
-
-#theme-panel .palette-btn.is-active {
-  border: 3px solid #ffffff !important;
-  box-shadow: 0 0 0 2px #000000, 0 0 10px rgba(0,0,0,0.5) !important;
-  transform: scale(1.05) !important;
-  z-index: 1;
-}
-
-
-/* ================= 特效面板样式 ================= */
-.effect-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: .5rem;
-}
-.effect-btn {
-  height: 2.6rem;
-  border-radius: var(--bulma-radius);
-  border: 1px solid var(--bulma-border-weak);
-  background: var(--bulma-scheme-main-bis);
-  color: var(--bulma-text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  transition: all .15s ease;
-}
+.effect-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; }
+.effect-btn { height: 2.6rem; border-radius: var(--bulma-radius); border: 1px solid var(--bulma-border-weak); background: var(--bulma-scheme-main-bis); color: var(--bulma-text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all .15s ease; }
 .effect-btn:hover { border-color: var(--bulma-primary); color: var(--bulma-primary); }
 [data-theme="dark"] .effect-btn { background: var(--bg-dark-card-hover); border-color: var(--border-dark); color: #ccc; }
+#theme-panel .effect-btn.is-active { background-color: var(--bulma-primary) !important; color: var(--bulma-primary-invert) !important; border-color: var(--bulma-primary) !important; box-shadow: 0 0 8px var(--bulma-primary); }
 
-#theme-panel .effect-btn.is-active {
-  background-color: var(--bulma-primary) !important;
-  color: var(--bulma-primary-invert) !important;
-  border-color: var(--bulma-primary) !important;
-  box-shadow: 0 0 8px var(--bulma-primary);
-}
-
-/* ================= 透明度滑块样式 ================= */
-.opacity-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1rem;
-  font-size: .8rem;
-  color: var(--bulma-text-light);
-}
-.opacity-row input[type="range"] {
-  -webkit-appearance: none;
-  width: 70%;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--bulma-border-weak);
-  outline: none;
-}
-[data-theme="dark"] .opacity-row input[type="range"] {
-  background: var(--border-dark);
-}
-.opacity-row input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--bulma-primary);
-  cursor: pointer;
-  box-shadow: 0 0 4px rgba(0,0,0,0.3);
-  transition: transform .1s;
-}
-.opacity-row input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-
-/* ================= 终极滑块样式覆盖 ================= */
-.opacity-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1rem;
-  font-size: .8rem;
-  color: var(--bulma-text-light);
-  position: relative;
-  z-index: 10; /* 确保不被遮挡 */
-}
-
-.opacity-row input[type="range"] {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 70% !important;
-  height: 6px !important;
-  border-radius: 3px !important;
-  background: var(--bulma-border-weak) !important;
-  outline: none !important;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-}
-[data-theme="dark"] .opacity-row input[type="range"] {
-  background: var(--border-dark) !important;
-}
-
-.opacity-row input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  width: 16px !important;
-  height: 16px !important;
-  border-radius: 50% !important;
-  background: var(--bulma-primary) !important;
-  cursor: pointer !important;
-  box-shadow: 0 0 6px rgba(0,0,0,0.4) !important;
-  transition: transform .1s !important;
-}
-.opacity-row input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2) !important;
-}
+.opacity-row { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; font-size: .8rem; color: var(--bulma-text-light); position: relative; z-index: 10; }
+.opacity-row input[type="range"] { -webkit-appearance: none !important; appearance: none !important; width: 70% !important; height: 6px !important; border-radius: 3px !important; background: var(--bulma-border-weak) !important; outline: none !important; cursor: pointer !important; pointer-events: auto !important; }
+[data-theme="dark"] .opacity-row input[type="range"] { background: var(--border-dark) !important; }
+.opacity-row input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none !important; appearance: none !important; width: 16px !important; height: 16px !important; border-radius: 50% !important; background: var(--bulma-primary) !important; cursor: pointer !important; box-shadow: 0 0 6px rgba(0,0,0,0.4) !important; transition: transform .1s !important; }
+.opacity-row input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2) !important; }

@@ -1,4 +1,4 @@
-﻿// 首页：按分类聚合，网格卡片展示最新文章
+﻿// 首页：门户式布局，突出个人名片与最新文章
 let ALL_POSTS = [];
 let SITE_CONFIG = {};
 
@@ -39,65 +39,6 @@ function getDynamicGreeting() {
   return "🌙 夜深了，早点休息哦";
 }
 
-// 构建首页数据
-function buildHomeData(posts) {
-  const tree = new Map();
-
-  posts.forEach(p => {
-    const cat = p.category || p.series || "未分类";
-    const sub = p.category ? (p.series || "默认子系列") : null;
-
-    if (!tree.has(cat)) {
-      tree.set(cat, { name: cat, subMap: new Map(), directPosts: [] });
-    }
-
-    if (sub) {
-      if (!tree.get(cat).subMap.has(sub)) {
-        tree.get(cat).subMap.set(sub, []);
-      }
-      tree.get(cat).subMap.get(sub).push(p);
-    } else {
-      tree.get(cat).directPosts.push(p);
-    }
-  });
-
-  const result = [];
-  const sortedCats = Array.from(tree.keys()).sort((a, b) => a.localeCompare(b, "zh"));
-
-  sortedCats.forEach(cat => {
-    const catData = tree.get(cat);
-    const allCatPosts = [];
-
-    const sortedSubs = Array.from(catData.subMap.keys()).sort((a, b) => a.localeCompare(b, "zh"));
-    sortedSubs.forEach(sub => {
-      const seriesPosts = catData.subMap.get(sub).sort((a, b) => new Date(b.date) - new Date(a.date));
-      allCatPosts.push(...seriesPosts);
-    });
-
-    if (catData.directPosts.length > 0) {
-      const direct = catData.directPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
-      allCatPosts.push(...direct);
-    }
-
-    allCatPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    result.push({
-      key: cat,
-      name: cat,
-      latestPosts: allCatPosts.slice(0, 3),
-      totalCount: allCatPosts.length
-    });
-  });
-
-  result.sort((a, b) => {
-    const da = a.latestPosts[0] ? new Date(a.latestPosts[0].date) : 0;
-    const db = b.latestPosts[0] ? new Date(b.latestPosts[0].date) : 0;
-    return db - da;
-  });
-
-  return result;
-}
-
 // 生成统一的网格卡片
 function renderCard(post) {
   const tags = (post.tags || []).map(t => `<span class="tag is-info is-light">${t}</span>`).join("");
@@ -112,37 +53,26 @@ function renderCard(post) {
     </a>`;
 }
 
-function renderHomeList(homeData) {
-  const listEl = document.getElementById("post-list");
-  
-  if (homeData.length === 0) {
+// 渲染最新的文章列表
+function renderLatestPosts(posts) {
+  const listEl = document.getElementById("latest-posts");
+  if (!listEl) return;
+
+  // 按时间倒序取最新 4 篇
+  const latest = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+
+  if (latest.length === 0) {
     listEl.innerHTML = `<div class="notification is-warning">还没有文章。</div>`;
     return;
   }
 
-  listEl.innerHTML = homeData.map(cat => `
-    <div class="category-wrapper" style="margin-bottom: 2rem;">
-      <div class="category-header">
-        <h3 class="category-title">
-          <span class="icon has-text-primary mr-2"><i class="fas fa-folder-open"></i></span>
-          ${cat.name}
-          <span class="posts-group-count">${cat.totalCount} 篇</span>
-        </h3>
-        <a href="posts?view=series&category=${encodeURIComponent(cat.name)}" class="button is-small is-rounded is-light mt-2">
-          查看全部 <i class="fas fa-arrow-right ml-1" style="font-size:0.8em;"></i>
-        </a>
-      </div>
-      
-      <div class="category-body posts-cards" style="padding-top: 0.5rem;">
-        ${cat.latestPosts.map(p => renderCard(p)).join("")}
-      </div>
-    </div>
-  `).join("");
+  listEl.innerHTML = latest.map(p => renderCard(p)).join("");
 }
 
 async function initHome() {
   const config = await initLayout("index.html");
 
+  // 1. 渲染 Hero 打字机
   const hero = (config && config.hero) || {};
   const heroTitle = document.getElementById("hero-title");
   const heroSubtitle = document.getElementById("hero-subtitle");
@@ -158,6 +88,7 @@ async function initHome() {
   const profileEl = document.getElementById("sidebar-profile");
   const sidebarProjects = document.getElementById("sidebar-projects");
 
+  // 2. 渲染侧边栏项目
   if (sidebarProjects) {
     let projects = [];
     try {
@@ -174,22 +105,27 @@ async function initHome() {
     `).join("");
   }
 
+  // 3. 渲染左侧个人名片（更宽大、更像横幅）
   if (profileEl && config && config.author) {
     const a = config.author;
     const greeting = getDynamicGreeting();
-    profileEl.innerHTML = `
-      <div class="box has-text-centered" style="border-radius: var(--bulma-radius-large);">
-        <figure class="image is-96x96 is-inline-block mb-3"><img class="is-rounded" src="${a.avatar || "images/avatar.png"}" style="object-fit: cover;"></figure>
-        <h3 class="title is-5 mb-1">${a.name || "佚名"}</h3>
-        <p class="is-size-7 has-text-grey mb-2">${a.bio || "开发者"}</p>
-        <div class="has-text-primary is-size-7 mb-3 font-weight-bold" style="background: var(--bulma-primary-soft); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block;">
-          ${greeting}
+      profileEl.innerHTML = `
+      <div class="profile-banner">
+        <figure class="image is-96x96 flex-shrink-0">
+          <img class="is-rounded" src="${a.avatar || "images/avatar.png"}" style="object-fit: cover;">
+        </figure>
+        <div>
+          <h3 class="title is-4 mb-1">${a.name || "佚名"}</h3>
+          <p class="is-size-6 has-text-grey mb-2">${a.bio || "开发者"}</p>
+          <div class="has-text-primary is-size-7 font-weight-bold" style="background: var(--bulma-primary-soft); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block;">
+            ${greeting}
+          </div>
+          <a href="about" class="button is-small is-rounded is-light ml-3">了解更多</a>
         </div>
-        <br>
-        <a href="about" class="button is-small is-rounded is-light">了解更多</a>
       </div>`;
   }
 
+  // 4. 获取文章并渲染最近动态
   try {
     ALL_POSTS = await loadPostIndex();
     if (ALL_POSTS.length === 0) {
@@ -197,8 +133,7 @@ async function initHome() {
       return;
     }
     
-    const homeData = buildHomeData(ALL_POSTS);
-    renderHomeList(homeData);
+    renderLatestPosts(ALL_POSTS);
   } catch (e) {
     statusEl.innerHTML = `<div class="notification is-danger">读取文章清单失败：${e.message}</div>`;
   }
