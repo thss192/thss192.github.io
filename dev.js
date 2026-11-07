@@ -1,4 +1,4 @@
-// dev.js - 零依赖的本地开发服务器 + 全目录监听 + 自动刷新 + 无后缀路由支持
+// dev.js - 零依赖的本地开发服务器 (绝对可靠的刷新版)
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -8,7 +8,6 @@ const crypto = require("crypto");
 const PORT = process.env.PORT || 8000;
 const ROOT = __dirname;
 
-// 1. 极简静态文件服务器
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -30,14 +29,12 @@ const server = http.createServer((req, res) => {
   
   let filePath = path.join(ROOT, decodeURIComponent(urlPath));
   
-  // 【新增】：如果访问的路径没有扩展名（比如 /index 或 /posts），自动补全 .html
   if (!path.extname(filePath)) {
     filePath += ".html";
   }
   
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      // 如果补全 .html 后还找不到，再尝试找对应文件夹下的 index.html
       if (err.code === 'ENOENT') {
         const fallbackPath = path.join(ROOT, decodeURIComponent(urlPath), "index.html");
         fs.readFile(fallbackPath, (err2, data2) => {
@@ -54,27 +51,25 @@ const server = http.createServer((req, res) => {
       res.end("404 Not Found");
       return;
     }
-    
     serveFile(req, res, filePath, data);
   });
 });
 
-// 提取出公共的返回文件逻辑（处理 HTML 注入等）
 function serveFile(req, res, filePath, data) {
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || "application/octet-stream";
   
-  // 注入自动刷新代码
   if (ext === ".html") {
     let html = data.toString("utf8");
     const reloadScript = `
       <script>
         (function() {
+          // 使用随机时间戳防止浏览器缓存 WebSocket
           const ws = new WebSocket('ws://' + location.host);
           ws.onmessage = function(e) {
             if (e.data === 'reload') {
-              console.log('🔄 检测到文件变动，自动刷新页面...');
-              location.reload();
+              console.log('🔄 正在刷新页面...');
+              window.location.reload();
             }
           };
         })();
@@ -88,7 +83,7 @@ function serveFile(req, res, filePath, data) {
   res.end(data);
 }
 
-// 2. WebSocket 广播机制
+// WebSocket 机制
 let wsClients = [];
 server.on("upgrade", (req, socket) => {
   if (req.headers.upgrade.toLowerCase() !== "websocket") return socket.destroy();
@@ -101,7 +96,7 @@ server.on("upgrade", (req, socket) => {
 });
 
 function broadcastReload() {
-  // 将断开的客户端过滤掉，避免写入异常
+  console.log("📡 正在通知浏览器刷新...");
   wsClients = wsClients.filter(socket => {
     try {
       if (socket.destroyed) return false;
@@ -109,65 +104,63 @@ function broadcastReload() {
       const frame = Buffer.concat([Buffer.from([0x81, msg.length]), msg]);
       socket.write(frame);
       return true;
-    } catch (e) {
-      return false; // 写入失败则踢出列表
-    }
+    } catch (e) { return false; }
   });
 }
 
 server.listen(PORT, () => {
   console.log(`\n🚦 本地开发服务器已启动: http://localhost:${PORT}`);
-  console.log(`👀 正在监听整个项目文件夹，修改任意文件均会自动刷新...\n`);
 });
 
-// 3. 自动同步脚本逻辑
-function runGenerate() {
-  console.log("🔄 正在同步数据...");
-  exec("node scripts/generate-index.js", (err, stdout, stderr) => {
-    if (err) {
-      console.error("❌ 生成索引失败:\n", stderr);
-    } else {
-      console.log(`✅ 数据已同步 ${new Date().toLocaleTimeString()}\n${stdout.trim()}\n`);
-      broadcastReload(); // 数据同步完后广播刷新
-    }
-  });
+function runGenerate(callback) {
+  console.log("🔄 正在编译文章索引...");
+  // 延迟 100ms 等待文件写入完成
+  setTimeout(() => {
+    exec("node scripts/generate-index.js", (err, stdout, stderr) => {
+      if (err) {
+        console.error("❌ 索引生成失败:", stderr);
+      } else {
+        console.log(`✅ 索引同步完成`);
+      }
+      if (callback) callback();
+    });
+  }, 100);
 }
 
 runGenerate();
 
-// 4. 监听整个根目录
-let timeout = null;
-// 允许监听的后缀（过滤掉不需要刷新的文件，比如图片、字体等）
-const ALLOWED_EXTS = [".html", ".css", ".js", ".json", ".md", ".svg"];
-// 忽略的文件夹和特定文件（防止刷新死循环）
+// ======= 终极监听：只要变了就触发 =======
+let isProcessing = false;
+const ALLOWED_EXTS = [".html", ".css", ".js", ".md", ".json"];
 const IGNORE_DIRS = [".git", "node_modules", "images", "libs"];
-const IGNORE_FILES = ["index.json", "search-index.json", "fallback-data.js", "dev.js", "start.bat"];
+const IGNORE_FILES = ["dev.js", "start.bat"];
 
 fs.watch(ROOT, { recursive: true }, (eventType, filename) => {
-  if (!filename) return;
+  if (!filename || isProcessing) return;
 
-  // 1. 过滤掉忽略的目录
   const pathParts = filename.split(path.sep);
   if (pathParts.some(part => IGNORE_DIRS.includes(part))) return;
-  
-  // 2. 过滤掉忽略的文件
   if (IGNORE_FILES.includes(path.basename(filename))) return;
-
-  // 3. 只处理指定后缀的文件
+  
   const ext = path.extname(filename).toLowerCase();
   if (!ALLOWED_EXTS.includes(ext)) return;
 
-  // 4. 防抖处理：文件保存可能触发多次事件，合并成一次刷新
-  clearTimeout(timeout);
-  timeout = setTimeout(() => {
-    console.log(`📝 检测到变动: ${filename}`);
-    
-    // 如果改的是 md 文件或 config.json，先跑数据生成，然后再刷新
-    if (filename.endsWith(".md") || filename.endsWith("config.json") || filename.endsWith("projects.json") || filename.endsWith("links.json")) {
-      runGenerate();
-    } else {
-      // 如果改的是 html/css/js，直接刷新
-      broadcastReload();
-    }
-  }, 150); // 150ms 防抖延迟
+  // 如果正在处理上一次，就跳过
+  isProcessing = true;
+  console.log(`\n📝 检测到变动: ${filename} (${eventType})`);
+
+  if (ext === ".md") {
+    runGenerate(() => {
+      // 延迟发送给浏览器，防止与编辑器冲突
+      setTimeout(() => {
+        broadcastReload();
+        // 2秒后解锁，允许下一次监听
+        setTimeout(() => { isProcessing = false; }, 2000);
+      }, 200);
+    });
+  } else {
+    // 其他文件直接刷新
+    broadcastReload();
+    setTimeout(() => { isProcessing = false; }, 1000);
+  }
 });
