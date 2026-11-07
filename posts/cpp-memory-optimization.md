@@ -1,7 +1,7 @@
 ﻿---
 title: 程序体积优化规范 (C++)
 date: 2026-11-07
-tags: [C++, 优化, 性能]
+tags: [优化]
 category: 技术笔记
 series: C++
 order: 1

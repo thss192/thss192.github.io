@@ -194,9 +194,7 @@ window.__POSTS_FALLBACK__ = [
     "date": "2026-11-07",
     "order": 1,
     "tags": [
-      "C++",
-      "优化",
-      "性能"
+      "优化"
     ],
     "category": "技术笔记",
     "series": "C++",
