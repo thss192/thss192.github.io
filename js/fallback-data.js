@@ -189,6 +189,19 @@ window.__POSTS_FALLBACK__ = [
     "summary": "规范推送代码流程。"
   },
   {
+    "slug": "2026-11-11",
+    "title": "uv的使用",
+    "date": "2026-11-11",
+    "order": 9999,
+    "tags": [
+      "服务器",
+      "python"
+    ],
+    "category": "技术笔记",
+    "series": "项目笔记",
+    "summary": "学习python"
+  },
+  {
     "slug": "cpp-memory-optimization",
     "title": "程序体积优化规范 (C++)",
     "date": "2026-11-07",
