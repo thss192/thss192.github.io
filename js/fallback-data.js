@@ -198,7 +198,7 @@ window.__POSTS_FALLBACK__ = [
       "python"
     ],
     "category": "技术笔记",
-    "series": "项目笔记",
+    "series": "Python",
     "summary": "学习python"
   },
   {
